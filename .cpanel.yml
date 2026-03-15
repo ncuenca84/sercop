@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - echo "Deploy OK"
+    - /bin/true
