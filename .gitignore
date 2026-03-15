@@ -30,3 +30,5 @@ test_pdf.php
 
 # PHP config local
 php.ini
+.htaccess
+.user.ini
