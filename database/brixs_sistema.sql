@@ -639,7 +639,7 @@ CREATE TABLE `procesos` (
   `fecha_inicio` date DEFAULT NULL,
   `fecha_limite_proforma` datetime DEFAULT NULL,
   `fecha_fin_calculada` date DEFAULT NULL,
-  `estado` enum('borrador','adjudicado','en_ejecucion','entregado_provisional','entregado_definitivo','facturado','pagado','cerrado','cancelado') COLLATE utf8mb4_unicode_ci DEFAULT 'adjudicado',
+  `estado` enum('borrador','en_proceso','adjudicado','en_ejecucion','entregado_provisional','entregado_definitivo','facturado','pagado','cerrado','cancelado') COLLATE utf8mb4_unicode_ci DEFAULT 'en_proceso',
   `fase` tinyint NOT NULL DEFAULT '1',
   `porcentaje_avance` decimal(5,2) DEFAULT '0.00',
   `tiene_anticipo` tinyint(1) DEFAULT '0',
