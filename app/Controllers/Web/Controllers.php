@@ -520,7 +520,7 @@ class ProcesosController extends BaseController
             'tiene_garantia'           => 1,
             'plazo_garantia_dias'      => 365,
             'fase'                     => 1,
-            'estado'                   => 'adjudicado',
+            'estado'                   => 'en_ejecucion',
             'created_by'               => authId(),
         ]);
 
@@ -1259,7 +1259,7 @@ class IaController extends BaseController
             'fecha_inicio'         => $datos['fecha_inicio'] ?? date('Y-m-d'),
             'tiene_garantia'       => 1,
             'plazo_garantia_dias'  => 365,
-            'estado'               => 'adjudicado',
+            'estado'               => 'en_ejecucion',
             'datos_ia'             => $analisis['datos_extraidos'],
             'created_by'           => authId(),
         ]);
