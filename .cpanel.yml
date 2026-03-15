@@ -1,7 +1,4 @@
 ---
 deployment:
   tasks:
-    - /usr/local/bin/php /usr/local/bin/composer install --no-dev --no-interaction --quiet 2>/dev/null || true
-    - find storage -type d -exec chmod 755 {} \; 2>/dev/null || true
-    - find storage -type f -exec chmod 644 {} \; 2>/dev/null || true
-    - chmod 600 .env 2>/dev/null || true
+    - echo "Deployment OK"
