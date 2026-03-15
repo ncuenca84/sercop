@@ -140,9 +140,6 @@
         <a href="/configuracion/proforma" class="list-group-item list-group-item-action">
           <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>Configurar Proformas
         </a>
-        <a href="/plantillas-docx" class="list-group-item list-group-item-action">
-          <i class="bi bi-file-earmark-word me-2 text-success"></i>Plantillas Word
-        </a>
         <a href="/configuracion/plantillas" class="list-group-item list-group-item-action">
           <i class="bi bi-file-earmark-code me-2 text-secondary"></i>Plantillas HTML
         </a>

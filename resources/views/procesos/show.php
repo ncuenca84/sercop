@@ -13,9 +13,6 @@
     <a href="/procesos/<?= $proceso['id'] ?>/proforma" class="btn btn-sm btn-danger" target="_blank">
       <i class="bi bi-file-earmark-pdf me-1"></i>Proforma
     </a>
-    <a href="/procesos/<?= $proceso['id'] ?>/generar-docx" class="btn btn-sm btn-success">
-      <i class="bi bi-file-earmark-word me-1"></i>Generar Word
-    </a>
     <div class="dropdown">
       <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
         <i class="bi bi-file-earmark-plus me-1"></i>Generar Documento
@@ -23,9 +20,9 @@
       <ul class="dropdown-menu shadow-sm">
         <?php foreach([
           'proforma_sercop'    => ['&#x1F9FE;','Proforma para SERCOP'],
-          'aceptacion_oc'      => ['í ½í³‹','AceptaciÃ³n de Orden de Compra'],
-          'informe_tecnico'    => ['í ½í³„','Informe TÃ©cnico de Entrega'],
-          'garantia_tecnica'   => ['í ½í»¡ï¸','GarantÃ­a TÃ©cnica'],
+          'aceptacion_oc'      => ['ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½','AceptaciÃ³n de Orden de Compra'],
+          'informe_tecnico'    => ['ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½','Informe TÃ©cnico de Entrega'],
+          'garantia_tecnica'   => ['ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¸','GarantÃ­a TÃ©cnica'],
           'acta_provisional'   => ['&#x1F4DD;','Acta Entrega Provisional'],
           'acta_definitiva'    => ['&#x2705;','Acta Entrega Definitiva'],
           'solicitud_pago'     => ['&#x1F4B0;','Solicitud de Pago'],
