@@ -159,6 +159,7 @@ function estadoBadge(string $estado): string
     $map = [
         'borrador'               => ['secondary', 'Borrador'],
         'adjudicado'             => ['primary',   'Adjudicado'],
+        'en_proceso'             => ['info',      'En Proceso'],
         'en_ejecucion'           => ['info',      'En Ejecución'],
         'entregado_provisional'  => ['warning',   'Entregado Provisional'],
         'entregado_definitivo'   => ['success',   'Entregado Definitivo'],
