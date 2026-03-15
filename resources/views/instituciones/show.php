@@ -90,11 +90,11 @@
   // Helpers de semÃ¡foro
   $semaforo = function(string $estado): string {
     return match($estado) {
-      'vencido'    => '<span class="badge bg-danger">í ½í´´ Vencido</span>',
-      'por_vencer' => '<span class="badge bg-warning text-dark">í ½í¿¡ Por vencer</span>',
-      'suspendido' => '<span class="badge bg-secondary">â¸ Suspendido</span>',
-      'cancelado'  => '<span class="badge bg-dark">âœ– Cancelado</span>',
-      default      => '<span class="badge bg-success">í ½í¿¢ Activo</span>',
+      'vencido'    => '<span class="badge bg-danger">Vencido</span>',
+      'por_vencer' => '<span class="badge bg-warning text-dark">Por vencer</span>',
+      'suspendido' => '<span class="badge bg-secondary">Suspendido</span>',
+      'cancelado'  => '<span class="badge bg-dark">Cancelado</span>',
+      default      => '<span class="badge bg-success">Activo</span>',
     };
   };
   ?>
@@ -489,11 +489,11 @@ function mostrarResumenRdap(parsed, dominio) {
   div.innerHTML = `
     <div class="alert alert-success py-2 small mb-0">
       <strong><i class="bi bi-check-circle me-1"></i>Datos RDAP obtenidos para ${dominio}</strong><br>
-      <span class="me-3">í ½í³… Registrado: ${fmt(parsed.fecha_registro)}</span>
+      <span class="me-3">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Registrado: ${fmt(parsed.fecha_registro)}</span>
       <span class="me-3">â° Caduca: ${fmt(parsed.fecha_caducidad)}</span>
       ${dias !== null ? `<span class="${colorDias}">âš¡ ${dias >= 0 ? dias+' dÃ­as restantes' : 'Vencido hace '+Math.abs(dias)+' dÃ­as'}</span>` : ''}
-      ${parsed.titular ? `<br>í ½í±¤ Titular: ${parsed.titular}` : ''}
-      ${parsed.nameservers.length ? `<br>í ½í¶¥ NS: ${parsed.nameservers.join(', ')}` : ''}
+      ${parsed.titular ? `<br>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Titular: ${parsed.titular}` : ''}
+      ${parsed.nameservers.length ? `<br>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ NS: ${parsed.nameservers.join(', ')}` : ''}
     </div>`;
   div.classList.remove('d-none');
 }
