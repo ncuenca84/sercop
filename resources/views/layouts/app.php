@@ -342,9 +342,6 @@ border-radius:4px;
 <?php endif; ?>
 </a>
 
-<a href="/plantillas-docx" class="nav-link <?= str_contains($_SERVER['REQUEST_URI'],'/plantillas-docx')?'active':'' ?>">
-<i class="bi bi-file-earmark-word"></i> Plantillas Word
-</a>
 
 <a href="/configuracion" class="nav-link <?= str_contains($_SERVER['REQUEST_URI'],'/configuracion')?'active':'' ?>">
 <i class="bi bi-gear"></i> Configuración

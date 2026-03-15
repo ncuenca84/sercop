@@ -64,7 +64,9 @@ class View
     public static function redirect(string $url, int $status = 302): void
     {
         if (!str_starts_with($url, 'http')) {
-            $url = APP_URL . '/' . ltrim($url, '/');
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+            $host   = $_SERVER['HTTP_HOST'] ?? parse_url(APP_URL, PHP_URL_HOST) ?? 'localhost';
+            $url    = $scheme . '://' . $host . '/' . ltrim($url, '/');
         }
         header("Location: {$url}", true, $status);
         exit;

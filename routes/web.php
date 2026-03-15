@@ -108,13 +108,6 @@ $r->get('/configuracion/proforma',          'ProformaController@configurar',   [
 $r->post('/configuracion/proforma',         'ProformaController@guardarConfig',['AuthMiddleware']);
 $r->post('/configuracion/proforma/plantilla','ProformaController@guardarPlantilla',['AuthMiddleware']);
 $r->post('/configuracion/proforma/logo',    'ProformaController@subirLogo',    ['AuthMiddleware']);
-$r->get('/plantillas-docx',                 'PlantillasDocxController@index',        ['AuthMiddleware']);
-$r->post('/plantillas-docx',                'PlantillasDocxController@store',        ['AuthMiddleware']);
-$r->post('/plantillas-docx/{id}/eliminar',  'PlantillasDocxController@destroy',      ['AuthMiddleware']);
-$r->get('/plantillas-docx/{id}/marcadores', 'PlantillasDocxController@marcadores',   ['AuthMiddleware']);
-// Generar documento Word desde plantilla para un proceso específico
-$r->get('/procesos/{id}/generar-docx',      'PlantillasDocxController@generar',      ['AuthMiddleware']);
-$r->post('/procesos/{id}/generar-docx',     'PlantillasDocxController@generarPost',  ['AuthMiddleware']);
 
 // ── Cron (protegido por token) ─────────────────────────────────────────────
 $r->get('/cron/run', 'CronController@run');

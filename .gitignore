@@ -30,5 +30,6 @@ test_pdf.php
 
 # PHP config local
 php.ini
-.htaccess
+
+# Archivos generados por cPanel (no deben trackearse)
 .user.ini
