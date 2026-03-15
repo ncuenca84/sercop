@@ -1,12 +1,4 @@
 ---
 deployment:
   tasks:
-    # Instalar/actualizar dependencias PHP (composer)
-    - /usr/local/bin/php /usr/local/bin/composer install --no-dev --no-interaction --quiet 2>/dev/null || /usr/local/bin/php composer.phar install --no-dev --no-interaction --quiet 2>/dev/null || true
-
-    # Asegurar permisos correctos en carpetas de escritura
-    - find storage -type d -exec chmod 755 {} \; 2>/dev/null || true
-    - find storage -type f -exec chmod 644 {} \; 2>/dev/null || true
-
-    # Proteger el archivo .env (solo lectura para el propietario)
-    - chmod 600 .env 2>/dev/null || true
+    - echo "Deploy OK"
