@@ -65,20 +65,27 @@ class DB
     public static function insert(string $table, array $data): int
     {
         $data = self::injectTenant($table, $data);
-        $cols = implode(', ', array_keys($data));
+        $cols = implode(', ', array_map(fn($c) => "`{$c}`", array_keys($data)));
         $phs  = implode(', ', array_fill(0, count($data), '?'));
-        self::query("INSERT INTO {$table} ({$cols}) VALUES ({$phs})", array_values($data));
+        self::query("INSERT INTO `{$table}` ({$cols}) VALUES ({$phs})", array_values($data));
         return (int) self::connection()->lastInsertId();
     }
 
     // ── Actualizar ─────────────────────────────────────────────────────────
     public static function update(string $table, array $data, array $where): int
     {
-        $set   = implode(', ', array_map(fn($c) => "{$c} = ?", array_keys($data)));
-        $cond  = implode(' AND ', array_map(fn($c) => "{$c} = ?", array_keys($where)));
+        $set    = implode(', ', array_map(fn($c) => "`{$c}` = ?", array_keys($data)));
+        $cond   = implode(' AND ', array_map(fn($c) => "`{$c}` = ?", array_keys($where)));
         $params = [...array_values($data), ...array_values($where)];
-        $stmt  = self::query("UPDATE {$table} SET {$set} WHERE {$cond}", $params);
+        $stmt   = self::query("UPDATE `{$table}` SET {$set} WHERE {$cond}", $params);
         return $stmt->rowCount();
+    }
+
+    // ── Ejecutar sentencia SQL directa (sin retorno) ───────────────────────
+    public static function statement(string $sql, array $params = []): bool
+    {
+        self::query($sql, $params);
+        return true;
     }
 
     // ── Eliminar lógico ────────────────────────────────────────────────────

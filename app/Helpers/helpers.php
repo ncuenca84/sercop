@@ -115,7 +115,8 @@ function uploadFile(array $file, string $destDir, array $allowedMimes = []): arr
     if ($file['error'] !== UPLOAD_ERR_OK) {
         throw new \RuntimeException('Error al subir el archivo.');
     }
-    $mime = mime_content_type($file['tmp_name']);
+    $finfo = new \finfo(FILEINFO_MIME_TYPE);
+    $mime  = $finfo->file($file['tmp_name']) ?: 'application/octet-stream';
     $allowed = $allowedMimes ?: ALLOWED_MIMES;
     if (!in_array($mime, $allowed)) {
         throw new \RuntimeException("Tipo de archivo no permitido: {$mime}");

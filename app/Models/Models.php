@@ -264,7 +264,7 @@ class DocumentoHabilitante extends BaseModel
              JOIN tenants t ON t.id = dh.tenant_id
              JOIN users u ON u.tenant_id = dh.tenant_id AND u.rol IN ('admin','gestor') AND u.estado = 'activo'
              WHERE dh.estado IN ('por_vencer','vencido') AND dh.deleted_at IS NULL
-             GROUP BY dh.id, u.id",
+             GROUP BY dh.id, u.id"
         );
     }
 }

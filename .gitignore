@@ -1,0 +1,32 @@
+# Entorno y configuración sensible
+.env
+.env.local
+.env.*.local
+
+# Dependencias PHP
+/vendor/
+
+# Archivos de caché y logs
+/storage/logs/*.log
+/storage/sessions/
+/storage/cache/
+error_log
+
+# Archivos subidos por usuarios
+/storage/uploads/
+/storage/documents/
+/storage/adjuntos_sercop/
+
+# Archivos temporales y del sistema
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Archivos de diagnóstico/test locales
+testpdf.php
+test_ia.php
+test_pdf.php
+
+# PHP config local
+php.ini

@@ -671,7 +671,12 @@ class ProcesosController extends BaseController
     {
         $this->requirePermission('procesos.*');
         verifyCsrf();
-        $nuevoEstado = $this->input('estado');
+        $nuevoEstado = (string)$this->input('estado', '');
+        if ($nuevoEstado === '') {
+            View::flash('error', 'Estado no especificado.');
+            $this->redirect("/procesos/{$id}");
+            return;
+        }
         Proceso::cambiarEstado((int)$id, $nuevoEstado);
         View::flash('success', 'Estado actualizado a: ' . $nuevoEstado);
         $this->redirect("/procesos/{$id}");
