@@ -79,7 +79,7 @@
         <form method="POST" action="/procesos/<?= $proceso['id'] ?>/estado" class="d-flex gap-2">
           <?= csrf_field() ?>
           <select name="estado" class="form-select form-select-sm">
-            <?php foreach(['adjudicado','en_proceso','en_ejecucion','entregado_provisional','entregado_definitivo','facturado','pagado','cerrado','cancelado'] as $est): ?>
+            <?php foreach(['en_proceso','adjudicado','en_ejecucion','entregado_provisional','entregado_definitivo','facturado','pagado','cerrado','cancelado'] as $est): ?>
             <option value="<?= $est ?>" <?= $proceso['estado']===$est?'selected':'' ?>><?= ucwords(str_replace('_',' ',$est)) ?></option>
             <?php endforeach; ?>
           </select>
