@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page{margin:1.5cm 2cm}*{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:10pt;color:#1a1a1a;line-height:1.4}
+  .header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1B4F72;padding-bottom:10px;margin-bottom:14px}
+  .header-logo img{max-height:60px;max-width:180px}
+  .header-logo-text{font-size:18pt;font-weight:bold;color:#1B4F72}
+  .header-empresa{text-align:right;font-size:8.5pt;color:#444}
+  .header-empresa strong{font-size:10pt;color:#1a1a1a;display:block}
+  .doc-titulo{text-align:center;margin:10px 0 14px}
+  .doc-titulo h1{font-size:13pt;font-weight:bold;text-transform:uppercase;color:#1B4F72}
+  .doc-fecha{text-align:right;font-size:9pt;color:#555;margin-bottom:10px}
+  .sec-tit{background:#1B4F72;color:white;font-weight:bold;font-size:9pt;padding:4px 8px;margin-bottom:6px;text-transform:uppercase}
+  .campo{display:flex;gap:6px;margin-bottom:3px;font-size:9.5pt}
+  .campo strong{min-width:160px;color:#333}
+  table{width:100%;border-collapse:collapse;margin:6px 0;font-size:9pt}
+  thead tr{background:#1B4F72;color:white}
+  thead th{padding:5px 6px;text-align:left}
+  tbody tr:nth-child(even){background:#f5f7fa}
+  tbody td{padding:5px 6px;border-bottom:1px solid #e0e0e0;vertical-align:top}
+  /* Tablas generadas por CKEditor */
+  .ck-content table{width:100%;border-collapse:collapse;margin:8px 0;font-size:9pt}
+  .ck-content table td,.ck-content table th{border:1px solid #ccc;padding:4px 6px;vertical-align:top}
+  .ck-content table thead td,.ck-content table th{background:#f0f0f0;font-weight:bold}
+  .ck-content ul,.ck-content ol{margin:4px 0 4px 18px;padding:0}
+  .ck-content li{margin-bottom:2px}
+  .ck-content p{margin-bottom:4px}
+  .ck-content figure.table{margin:6px 0;width:100%}
+  .ck-content figure.table table{width:100%}
+  tfoot td{padding:5px 6px;font-weight:bold;text-align:right;border-top:2px solid #1B4F72}
+  .firma-area{margin-top:30px;display:flex;justify-content:space-between}
+  .firma-box{text-align:center;width:44%}
+  .firma-linea{border-top:1px solid #333;margin-top:45px;padding-top:5px;font-size:9pt}
+  .doc-footer{margin-top:20px;padding-top:8px;border-top:1px solid #ddd;font-size:8pt;color:#888;text-align:center}
+  @media screen{body{max-width:800px;margin:20px auto;padding:20px;background:#f0f2f5}
+    .doc{background:white;padding:30px 35px;box-shadow:0 2px 12px rgba(0,0,0,.12);border-radius:4px}
+    .toolbar{background:#1B4F72;color:white;padding:10px 20px;display:flex;gap:10px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-radius:4px 4px 0 0}
+    .btn-print{background:#27ae60;color:white;border:none;padding:7px 16px;border-radius:4px;cursor:pointer;font-size:10pt;font-weight:bold}
+  .btn-pdf{background:#c0392b;color:white;border:none;padding:7px 16px;border-radius:4px;cursor:pointer;font-size:10pt;font-weight:bold;text-decoration:none;display:inline-block}
+    .btn-back{background:transparent;color:#aaa;border:1px solid #555;padding:6px 14px;border-radius:4px;font-size:9pt;text-decoration:none;color:#ccc}}
+  @media print{.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="toolbar no-print">
+  <div><h2 style="font-size:11pt;margin:0">&#128196; Proforma &mdash; NIC-1768107770001-2026-00008</h2>
+  <small style="color:#aaa">Lista para imprimir y firmar electr&oacute;nicamente</small></div>
+  <div style="display:flex;gap:8px">
+    <a href="#" class="btn-back">&larr; Volver</a>
+    <button class="btn-print" onclick="window.print()">&#128424; Imprimir / Guardar PDF</button>
+    <a href="#" class="btn-pdf">&#11015; Descargar PDF</a>
+  </div>
+</div>
+<div class="doc">
+  <div class="header">
+    <div class="header-logo"><img src="data:image/png;base64,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" alt="Logo"></div>
+    <div class="header-empresa">
+      <strong>Exxalink S.A.S</strong>
+      RUC: 1793190705001<br>
+      Sociedad · Régimen: General<br>
+      El espectador N150 y Ultimas Noticias <br>
+      Tel: 0984205823 · info@exxalink.com
+    </div>
+  </div>
+  <div class="doc-titulo"><h1>Proforma / Oferta Económica</h1>
+    <div style="font-size:10pt;color:#555">Proforma N° 2026-001</div>
+  </div>
+  <div class="doc-fecha">Quito, 9 de marzo de 2026</div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Destinatario</div>
+    <div class="campo"><strong>Entidad:</strong> GOBIERNO AUTONOMO DESCENTRALIZADO PARROQUIAL RURAL DE TOCACHI</div>
+    <div class="campo"><strong>RUC:</strong> 1768107770001</div>
+    <div class="campo"><strong>Código NIC:</strong> NIC-1768107770001-2026-00008</div>
+    <div class="campo"><strong>Funcionario Encargado:</strong> Lorena Vargas</div>
+    <div class="campo"><strong>Objeto de compra:</strong> CONTRATACIÓN DE REACTIVACIÓN, REDISEÑO, HOSTING, DOMINIO Y ADMINISTRACIÓN DE LA PÁGINA WEB, PARA EL GAD PARROQUIAL TOCACHI</div>
+    <div class="campo"><strong>Dirección:</strong> </div>
+  </div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Propuesta Económica</div>
+    <table><thead><tr>
+      <th style="width:12%">CPC</th><th style="width:5%">#</th>
+      <th>Descripción</th><th style="width:8%">Cant.</th>
+      <th style="width:12%">P. Unitario</th><th style="width:12%">Total</th>
+    </tr></thead>
+    <tbody><tr>
+            <td></td>
+            <td>1</td>
+            <td>CONTRATACIÓN DE REACTIVACIÓN, REDISEÑO, HOSTING, DOMINIO Y ADMINISTRACIÓN DE LA PÁGINA WEB, PARA EL GAD PARROQUIAL TOCACHI</td>
+            <td style='text-align:center'>1</td>
+            <td style='text-align:right'>$525.00</td>
+            <td style='text-align:right'>$525.00</td>
+        </tr></tbody>
+    <tfoot>
+      <tr><td colspan="5">SUBTOTAL:</td><td>$525.00</td></tr>
+      <tr><td colspan="5">I.V.A. (15%):</td><td>$78.75</td></tr>
+      <tr><td colspan="5" style="font-size:11pt">TOTAL:</td><td style="color:#1B4F72;font-size:12pt">$603.75</td></tr>
+    </tfoot></table>
+  </div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Condiciones Comerciales</div>
+    <div style="font-size:9.5pt">
+      <p><strong>Plazo de Entrega:</strong> El plazo será a partir de la aceptación de la orden de compra por el proveedor hasta su entrega total con lo cual se dará por terminado automáticamente, sin necesidad de notificación alguna, misma que se suscribirá entre la máxima autoridad y el proveedor seleccionado en el proceso de contratación por Ínfima cuantía publicada en el Portal de Compras Públicas.
+
+
+El plazo de duración del presente servicio es de 12 meses (año calendario)
+contado a partir de la suscripción de la orden de compra.
+</p>
+      <p><strong>Forma de Pago:</strong> Contra entrega del servicio/bien</p>
+      <p><strong>Vigencia de la Oferta:</strong> 30 días calendario</p>
+      <p><strong>Lugar de Entrega:</strong> Pichincha</p>
+    </div>
+  </div>
+  
+  <div style="margin-bottom:12px">
+            <div class="sec-tit">Especificaciones T&eacute;cnicas</div>
+            <div class="ck-content" style="font-size:9pt;line-height:1.5"><figure class="table"><table><tbody><tr><td>Nº</td><td>DESCRIPCION</td><td>CANTIDAD</td></tr><tr><td>&nbsp;</td><td>Contratación deServicios para&nbsp;la&nbsp;renovación de hosting, dominio,&nbsp;mantenimiento&nbsp;de la&nbsp;página&nbsp;web&nbsp;institucional (licencia&nbsp;anual)&nbsp;del&nbsp;Gobierno&nbsp;Autónomo&nbsp;Descentralizado parroquial&nbsp;de Bulán-Cantón&nbsp;Paute-Provincia del&nbsp;Azuay &nbsp;<a href="https://gadbulan.gob.ec/azuay/">https://gadbulan.gob.ec/azuay/</a></td><td rowspan="8"><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>1</p></td></tr><tr><td>&nbsp;</td><td><p>&nbsp;</p><p>Con &nbsp;esta &nbsp;contratación &nbsp;de &nbsp;servicio, &nbsp;nuestra &nbsp;Institución requiere&nbsp;que&nbsp;los&nbsp;iconos&nbsp;de&nbsp;las&nbsp;tareas&nbsp;principales&nbsp;del&nbsp;sitio</p></td></tr><tr><td>&nbsp;</td><td>web&nbsp; &nbsp; &nbsp;tengan&nbsp; &nbsp; &nbsp;un&nbsp; &nbsp;&nbsp;diseño&nbsp; &nbsp;&nbsp;de&nbsp; &nbsp;&nbsp;buen&nbsp; &nbsp;&nbsp;contenido,</td></tr><tr><td>&nbsp;</td><td>modernización &nbsp;y &nbsp;colores &nbsp;acordes &nbsp;a &nbsp;nuestra &nbsp;imagen</td></tr><tr><td>&nbsp;</td><td>institucional&nbsp; &nbsp;pudiendo&nbsp; &nbsp;ser&nbsp; &nbsp;&nbsp;cambiados&nbsp; &nbsp;en&nbsp; &nbsp;cualquier</td></tr><tr><td>&nbsp;</td><td>momento&nbsp;sin&nbsp; generar &nbsp;cargos&nbsp;o&nbsp;facturas &nbsp;adicionales&nbsp; &nbsp;al valor&nbsp;contratado&nbsp;de manera&nbsp;anual.</td></tr><tr><td>&nbsp;</td><td><p>&nbsp;</p><p>Uso&nbsp;activo&nbsp;de los servicios de&nbsp;la&nbsp;página web.</p></td></tr><tr><td>&nbsp;</td><td><p>&nbsp;</p><p>•&nbsp;Uso&nbsp;de&nbsp;correo&nbsp;institucional.</p><p>•&nbsp;Espacio&nbsp;Ilimitado.</p><p>•&nbsp;Transferencia&nbsp;ILIMITADA.</p><p>•&nbsp;Cuentas Correo&nbsp;ilimitadas.</p><p>•&nbsp;Bases de&nbsp;Datos Ilimitadas.</p><p>•&nbsp;DominiosIlimitados.</p><p>•&nbsp;Parking&nbsp;Ilimitado.</p><p>•&nbsp;Servicios brindados:</p><p>o&nbsp;Restauración ygeneración&nbsp;de&nbsp;respaldos.</p><p>o&nbsp;Actualizaciones&nbsp;de&nbsp;PHP,&nbsp;Mysql sistema&nbsp;preinstalado.</p><p>o&nbsp;CompilaciónPHP&nbsp;y&nbsp;optimizaciónMySQL.&nbsp;o</p><p>Configuración&nbsp;de DNS&nbsp;personalizada.</p><p>o&nbsp;Solución de&nbsp;problemas&nbsp;de&nbsp;FTP,&nbsp;sobre&nbsp;carga&nbsp;de servidor.</p></td></tr></tbody></table></figure><p>&nbsp;</p><p>&nbsp;</p><p><br>&nbsp;</p><p>&nbsp;</p></div></div>
+  <div style="margin-bottom:12px">
+            <div class="sec-tit">Metodolog&iacute;a de Trabajo</div>
+            <div class="ck-content" style="font-size:9pt;line-height:1.5"><p>METODOLOGIA DE&nbsp;TRABAJO</p><p>Para&nbsp; el &nbsp;presente&nbsp;procedimiento&nbsp;de &nbsp;contratación&nbsp; se&nbsp;lo&nbsp;realizará&nbsp; por&nbsp;ÍNFIMA CUANTÍA; a&nbsp;través&nbsp;del&nbsp;aplicativo&nbsp;Necesidades&nbsp;de&nbsp;Ínfima&nbsp;Cuantía&nbsp;establecido&nbsp;por el&nbsp;SERCOP,&nbsp;donde&nbsp;los&nbsp;proveedores&nbsp;deberán&nbsp;presentar&nbsp;las&nbsp;respectivas&nbsp;proformas, de la&nbsp;cual&nbsp;se elegirá&nbsp;la&nbsp;mejor opción&nbsp;para la&nbsp;institución.</p><p>El&nbsp;proveedor&nbsp;que resulte&nbsp;ganador&nbsp;brindará&nbsp;el&nbsp;servicio&nbsp;para&nbsp;la&nbsp;renovación&nbsp;de Hosting, dominio,&nbsp;mantenimiento&nbsp;de&nbsp;la&nbsp;página Web&nbsp;institucional&nbsp;(Licencia&nbsp;anual) (gadbulan.gob.ec)&nbsp;del&nbsp;Gobierno&nbsp;Autónomo&nbsp;Descentralizado&nbsp;Parroquial&nbsp;de Bulán del&nbsp;Cantón&nbsp;Paute-Provincia del&nbsp;Azuay.</p></div></div>
+  
+  <div style="margin-bottom:12px">
+            <div class="sec-tit">Forma y Condiciones de Pago</div>
+            <div class="ck-content" style="font-size:9.5pt;line-height:1.5"><p>El&nbsp;pago se&nbsp;realizará&nbsp;mediante&nbsp;el&nbsp;Sistema&nbsp;de Pagos&nbsp;Interbancario&nbsp;SPI,&nbsp;posterior&nbsp;a la entrega del&nbsp;servicio solicitado,&nbsp;y&nbsp;la&nbsp;emisión&nbsp;de&nbsp;la&nbsp;factura&nbsp;correspondiente.</p></div></div>
+  
+  
+  <div class="firma-area" style="justify-content:center">
+    <div class="firma-box" style="width:55%"><div class="firma-linea">
+      <strong>Nixon Cuenca</strong><br>
+      Representante Legal<br>
+      Exxalink S.A.S<br>
+      RUC: 1793190705001
+    </div></div>
+  </div>
+  <div class="doc-footer">
+    Documento generado por Sistema de Contratación Pública · Exxalink S.A.S · 9 de marzo de 2026
+  </div>
+</div>
+</body>
+</html>

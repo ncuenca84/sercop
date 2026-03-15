@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page{margin:1.5cm 2cm}*{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:10pt;color:#1a1a1a;line-height:1.4}
+  .header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1B4F72;padding-bottom:10px;margin-bottom:14px}
+  .header-logo img{max-height:60px;max-width:180px}
+  .header-logo-text{font-size:18pt;font-weight:bold;color:#1B4F72}
+  .header-empresa{text-align:right;font-size:8.5pt;color:#444}
+  .header-empresa strong{font-size:10pt;color:#1a1a1a;display:block}
+  .doc-titulo{text-align:center;margin:10px 0 14px}
+  .doc-titulo h1{font-size:13pt;font-weight:bold;text-transform:uppercase;color:#1B4F72}
+  .doc-fecha{text-align:right;font-size:9pt;color:#555;margin-bottom:10px}
+  .sec-tit{background:#1B4F72;color:white;font-weight:bold;font-size:9pt;padding:4px 8px;margin-bottom:6px;text-transform:uppercase}
+  .campo{display:flex;gap:6px;margin-bottom:3px;font-size:9.5pt}
+  .campo strong{min-width:160px;color:#333}
+  table{width:100%;border-collapse:collapse;margin:6px 0;font-size:9pt}
+  thead tr{background:#1B4F72;color:white}
+  thead th{padding:5px 6px;text-align:left}
+  tbody tr:nth-child(even){background:#f5f7fa}
+  tbody td{padding:5px 6px;border-bottom:1px solid #e0e0e0;vertical-align:top}
+  tfoot td{padding:5px 6px;font-weight:bold;text-align:right;border-top:2px solid #1B4F72}
+  .firma-area{margin-top:30px;display:flex;justify-content:space-between}
+  .firma-box{text-align:center;width:44%}
+  .firma-linea{border-top:1px solid #333;margin-top:45px;padding-top:5px;font-size:9pt}
+  .doc-footer{margin-top:20px;padding-top:8px;border-top:1px solid #ddd;font-size:8pt;color:#888;text-align:center}
+  @media screen{body{max-width:800px;margin:20px auto;padding:20px;background:#f0f2f5}
+    .doc{background:white;padding:30px 35px;box-shadow:0 2px 12px rgba(0,0,0,.12);border-radius:4px}
+    .toolbar{background:#1B4F72;color:white;padding:10px 20px;display:flex;gap:10px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-radius:4px 4px 0 0}
+    .btn-print{background:#27ae60;color:white;border:none;padding:7px 16px;border-radius:4px;cursor:pointer;font-size:10pt;font-weight:bold}
+    .btn-back{background:transparent;color:#ccc;border:1px solid #ccc;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:9pt;text-decoration:none}}
+  @media print{.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="toolbar no-print">
+  <div><h2 style="font-size:11pt;margin:0">📄 Proforma — NIC-1768107770001-2026-00008</h2>
+  <small style="color:#aaa">Lista para imprimir y firmar electrónicamente</small></div>
+  <div style="display:flex;gap:8px">
+    <a href="#" class="btn-back">← Volver</a>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+</div>
+<div class="doc">
+  <div class="header">
+    <div class="header-logo"><div class="header-logo-text">Exxalink S.A.S</div></div>
+    <div class="header-empresa">
+      <strong>Exxalink S.A.S</strong>
+      RUC: 1793190705001<br>
+      Sociedad · Régimen: General<br>
+      El espectador N150 y Ultimas Noticias <br>
+      Tel: 0984205823 · info@exxalink.com
+    </div>
+  </div>
+  <div class="doc-titulo"><h1>Proforma / Oferta Económica</h1>
+    <div style="font-size:10pt;color:#555">Proforma N° 2026-001</div>
+  </div>
+  <div class="doc-fecha">Quito, 7 de marzo de 2026</div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Destinatario</div>
+    <div class="campo"><strong>Entidad:</strong> GOBIERNO AUTONOMO DESCENTRALIZADO PARROQUIAL RURAL DE TOCACHI</div>
+    <div class="campo"><strong>RUC:</strong> 1768107770001</div>
+    <div class="campo"><strong>Código NIC:</strong> NIC-1768107770001-2026-00008</div>
+    <div class="campo"><strong>Funcionario Encargado:</strong> Lorena Vargas</div>
+    <div class="campo"><strong>Objeto de compra:</strong> CONTRATACIÓN DE REACTIVACIÓN, REDISEÑO, HOSTING, DOMINIO Y ADMINISTRACIÓN DE LA PÁGINA WEB, PARA EL GAD PARROQUIAL TOCACHI</div>
+    <div class="campo"><strong>Dirección:</strong> </div>
+  </div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Propuesta Económica</div>
+    <table><thead><tr>
+      <th style="width:12%">CPC</th><th style="width:5%">#</th>
+      <th>Descripción</th><th style="width:8%">Cant.</th>
+      <th style="width:12%">P. Unitario</th><th style="width:12%">Total</th>
+    </tr></thead>
+    <tbody><tr>
+            <td></td>
+            <td>1</td>
+            <td>CONTRATACIÓN DE REACTIVACIÓN, REDISEÑO, HOSTING, DOMINIO Y ADMINISTRACIÓN DE LA PÁGINA WEB, PARA EL GAD PARROQUIAL TOCACHI</td>
+            <td style='text-align:center'>1</td>
+            <td style='text-align:right'>$525.00</td>
+            <td style='text-align:right'>$525.00</td>
+        </tr></tbody>
+    <tfoot>
+      <tr><td colspan="5">SUBTOTAL:</td><td>$525.00</td></tr>
+      <tr><td colspan="5">I.V.A. (15%):</td><td>$78.75</td></tr>
+      <tr><td colspan="5" style="font-size:11pt">TOTAL:</td><td style="color:#1B4F72;font-size:12pt">$603.75</td></tr>
+    </tfoot></table>
+  </div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Condiciones Comerciales</div>
+    <div style="font-size:9.5pt">
+      <p><strong>Plazo de Entrega:</strong> 10 días calendario</p>
+      <p><strong>Forma de Pago:</strong> Contra entrega del servicio/bien</p>
+      <p><strong>Vigencia de la Oferta:</strong> 30 días calendario</p>
+      <p><strong>Lugar de Entrega:</strong> Pichincha</p>
+    </div>
+  </div>
+  
+  <div class="firma-area">
+    <div class="firma-box"><div class="firma-linea">
+      <strong>Nixon Cuenca</strong><br>Representante Legal<br>
+      Exxalink S.A.S<br>RUC: 1793190705001
+    </div></div>
+    <div class="firma-box"><div class="firma-linea">
+      <span style="color:#888;font-size:8.5pt">RECIBIDO POR:</span><br>
+      <strong>Lorena Vargas</strong><br>
+      Administrador del Contrato<br>GOBIERNO AUTONOMO DESCENTRALIZADO PARROQUIAL RURAL DE TOCACHI
+    </div></div>
+  </div>
+  <div class="doc-footer">
+    Documento generado por Sistema de Contratación Pública · Exxalink S.A.S · 7 de marzo de 2026
+  </div>
+</div>
+</body>
+</html>
