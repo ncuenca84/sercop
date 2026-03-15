@@ -1,0 +1,28 @@
+Options -Indexes
+Options +FollowSymLinks
+
+RewriteEngine On
+
+# Forzar HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Saltar archivos y directorios que existen físicamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Todo lo demás → index.php
+RewriteRule ^ index.php [L]
+
+# Proteger archivos sensibles
+<FilesMatch "^\.env|\.env\..*|composer\.(json|lock)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Deshabilitar ejecución de PHP en uploads
+<IfModule mod_php.c>
+    <Directory "storage/uploads">
+        php_flag engine off
+    </Directory>
+</IfModule>
