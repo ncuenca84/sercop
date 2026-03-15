@@ -69,4 +69,9 @@ abstract class BaseController
             exit;
         }
     }
+
+    protected function setFlash(string $type, string $message): void
+    {
+        View::flash($type, $message);
+    }
 }
