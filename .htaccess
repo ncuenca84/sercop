@@ -1,11 +1,6 @@
 Options -Indexes
 Options +FollowSymLinks
 
-# Forzar PHP 8.2 (CloudLinux alt-php)
-<IfModule mime_module>
-    AddHandler application/x-httpd-alt-php83 .php
-</IfModule>
-
 RewriteEngine On
 
 # Forzar HTTPS
