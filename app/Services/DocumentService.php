@@ -97,9 +97,7 @@ class DocumentoService
             '{{proveedor.email}}'         => htmlspecialchars($_SESSION['tenant_email'] ?? ''),
             // Entregables
             '{{entregables_tabla}}'       => $entregablesHtml,
-            // URLs
-            '{{url_back}}'                => '#',
-            '{{url_pdf}}'                 => '#',
+            // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
     }

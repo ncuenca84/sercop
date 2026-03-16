@@ -179,9 +179,7 @@ class ProformaService
                     ? $proceso['vigencia_oferta']
                     : ($config['vigencia_oferta'] ?? '30 días calendario')
             ),
-            // URL back (reemplazado en controller)
-            '{{url_back}}'               => '#',
-            '{{url_back_pdf}}'           => '#',
+            // URL back (inyectado por el controller, no reemplazar aquí)
         ];
     }
 
