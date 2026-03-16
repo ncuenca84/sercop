@@ -635,7 +635,7 @@ CREATE TABLE `procesos` (
   `moneda` varchar(3) COLLATE utf8mb4_unicode_ci DEFAULT 'USD',
   `plazo_dias` int NOT NULL DEFAULT '30',
   `plazo_texto` text COLLATE utf8mb4_unicode_ci,
-  `forma_pago` text COLLATE utf8mb4_unicode_ci,
+  `forma_pago` longtext COLLATE utf8mb4_unicode_ci,
   `fecha_inicio` date DEFAULT NULL,
   `fecha_limite_proforma` datetime DEFAULT NULL,
   `fecha_fin_calculada` date DEFAULT NULL,

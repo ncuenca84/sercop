@@ -192,6 +192,12 @@ class DocumentoService
             .seccion-body p, .ck-content p { margin-bottom: 4px; }
             .ck-content figure.table { margin: 6px 0; width: 100%; }
             .ck-content figure.table table { width: 100%; }
+            /* Imágenes generadas por CKEditor */
+            .seccion-body img, .ck-content img { max-width: 100%; height: auto; display: block; margin: 6px 0; }
+            .seccion-body figure.image, .ck-content figure.image { margin: 8px 0; text-align: center; }
+            .seccion-body figure.image img, .ck-content figure.image img { max-width: 100%; height: auto; }
+            .ck-content figure.image.image-style-side { float: right; max-width: 50%; margin: 4px 0 4px 12px; }
+            .ck-content figure.image figcaption { font-size: 8pt; color: #666; font-style: italic; margin-top: 3px; }
             /* Firma */
             .firma-section { margin-top: 40px; display: flex; justify-content: space-around; }
             .firma-box { text-align: center; width: 200px; }
