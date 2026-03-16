@@ -368,11 +368,14 @@ class PdfExtractorService
              . ' -sOutputFile=' . escapeshellarg($tmp)
              . ' ' . escapeshellarg($ruta)
              . ' 2>/dev/null';
-        exec($cmd, $out, $ret);
-
-        if (!file_exists($tmp)) return '';
-        $txt = file_get_contents($tmp);
-        @unlink($tmp);
+        try {
+            exec($cmd, $out, $ret);
+            $txt = file_exists($tmp) ? (string) file_get_contents($tmp) : '';
+        } finally {
+            if (file_exists($tmp)) {
+                unlink($tmp);
+            }
+        }
         return $txt ?: '';
     }
 
@@ -560,11 +563,14 @@ class PdfExtractorService
 
         $tmp  = tempnam(sys_get_temp_dir(), 'tdr_');
         $flag = $layout ? '-layout ' : '';
-        exec($bin . ' ' . $flag . escapeshellarg($ruta) . ' ' . escapeshellarg($tmp) . ' 2>/dev/null');
-
-        if (!file_exists($tmp)) return '';
-        $txt = file_get_contents($tmp);
-        @unlink($tmp);
+        try {
+            exec($bin . ' ' . $flag . escapeshellarg($ruta) . ' ' . escapeshellarg($tmp) . ' 2>/dev/null');
+            $txt = file_exists($tmp) ? (string) file_get_contents($tmp) : '';
+        } finally {
+            if (file_exists($tmp)) {
+                unlink($tmp);
+            }
+        }
         return $txt ?: '';
     }
 
@@ -1163,7 +1169,7 @@ class PdfExtractorService
         }
 
         // Método 2: leer el PDF como binario y extraer texto entre BT/ET
-        $raw = @file_get_contents($ruta);
+        $raw = file_exists($ruta) ? file_get_contents($ruta) : false;
         if (!$raw) return '';
 
         $texto = '';
@@ -1203,8 +1209,8 @@ class PdfExtractorService
 
         $partes = [];
         foreach ($patrones as $patron) {
-            $intento = @preg_split($patron, $texto, -1, PREG_SPLIT_DELIM_CAPTURE);
-            if (is_array($intento) && count($intento) >= 3) {
+            $intento = preg_split($patron, $texto, -1, PREG_SPLIT_DELIM_CAPTURE);
+            if ($intento !== false && preg_last_error() === PREG_NO_ERROR && count($intento) >= 3) {
                 $partes = $intento;
                 break;
             }

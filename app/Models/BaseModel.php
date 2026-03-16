@@ -31,8 +31,9 @@ abstract class BaseModel
     // ── Todos ─────────────────────────────────────────────────────────────
     public static function all(string $orderBy = 'created_at DESC'): array
     {
-        $where = static::$useTenant ? "WHERE tenant_id = " . (int)DB::getTenantId() : "WHERE 1=1";
-        $del   = static::$softDelete ? " AND deleted_at IS NULL" : "";
+        $orderBy = self::sanitizeOrderBy($orderBy);
+        $where   = static::$useTenant ? "WHERE tenant_id = " . (int)DB::getTenantId() : "WHERE 1=1";
+        $del     = static::$softDelete ? " AND deleted_at IS NULL" : "";
         return DB::select("SELECT * FROM " . static::$table . " {$where}{$del} ORDER BY {$orderBy}");
     }
 
@@ -67,6 +68,7 @@ abstract class BaseModel
     // ── Where ─────────────────────────────────────────────────────────────
     public static function where(array $conditions, string $orderBy = 'created_at DESC'): array
     {
+        $orderBy = self::sanitizeOrderBy($orderBy);
         if (static::$useTenant) $conditions['tenant_id'] = DB::getTenantId();
         $sql    = "SELECT * FROM " . static::$table . " WHERE ";
         $wheres = array_map(fn($c) => "{$c} = ?", array_keys($conditions));
@@ -74,6 +76,21 @@ abstract class BaseModel
         if (static::$softDelete) $sql .= " AND deleted_at IS NULL";
         $sql   .= " ORDER BY {$orderBy}";
         return DB::select($sql, array_values($conditions));
+    }
+
+    // ── Sanitizar ORDER BY (prevenir SQL injection) ────────────────────────
+    // Solo permite columnas alfanuméricas con _ y dirección ASC/DESC
+    private static function sanitizeOrderBy(string $orderBy): string
+    {
+        $allowed = preg_replace('/[^a-zA-Z0-9_,\. ]/', '', $orderBy);
+        $parts   = array_map('trim', explode(',', $allowed));
+        $safe    = [];
+        foreach ($parts as $part) {
+            if (preg_match('/^([a-zA-Z_][a-zA-Z0-9_.]*)\s*(ASC|DESC)?$/i', $part, $m)) {
+                $safe[] = $m[1] . (isset($m[2]) && $m[2] !== '' ? ' ' . strtoupper($m[2]) : '');
+            }
+        }
+        return $safe ? implode(', ', $safe) : 'created_at DESC';
     }
 
     public static function whereOne(array $conditions): ?array

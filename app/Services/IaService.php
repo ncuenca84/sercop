@@ -118,12 +118,15 @@ PROMPT;
             $pdftotext = trim((string) shell_exec('which pdftotext 2>/dev/null'));
             if ($pdftotext !== '') {
                 $tmp = tempnam(sys_get_temp_dir(), 'pdf_');
-                shell_exec("pdftotext " . escapeshellarg($filePath) . " " . escapeshellarg($tmp) . " 2>/dev/null");
-                if (file_exists($tmp)) {
-                    $text = file_get_contents($tmp);
-                    @unlink($tmp);
-                    if ($text) return $text;
+                try {
+                    shell_exec("pdftotext " . escapeshellarg($filePath) . " " . escapeshellarg($tmp) . " 2>/dev/null");
+                    $text = file_exists($tmp) ? (string) file_get_contents($tmp) : '';
+                } finally {
+                    if (file_exists($tmp)) {
+                        unlink($tmp);
+                    }
                 }
+                if ($text !== '') return $text;
             }
             // Fallback: leer bytes del PDF (limitado pero funcional)
             $rawContent = file_get_contents($filePath);

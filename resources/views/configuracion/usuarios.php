@@ -75,7 +75,7 @@ $usuarioActualId = Auth::id();
               <!-- Editar -->
               <button class="btn btn-outline-primary"
                       title="Editar usuario"
-                      onclick="abrirEditar(<?= htmlspecialchars(json_encode($u), ENT_QUOTES) ?>)">
+                      onclick="abrirEditar(<?= json_encode($u, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)">
                 <i class="bi bi-pencil"></i>
               </button>
               <!-- Toggle estado -->
@@ -89,7 +89,7 @@ $usuarioActualId = Auth::id();
               </form>
               <!-- Eliminar -->
               <form method="POST" action="/configuracion/usuarios/<?= (int)$u['id'] ?>/eliminar" class="d-inline"
-                    onsubmit="return confirm('¿Eliminar usuario <?= e(addslashes($u['nombre'])) ?>? Esta acción no se puede deshacer.')">
+                    onsubmit="return confirmarEliminar(<?= json_encode($u['nombre'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>)">
                 <?= csrf_field() ?>
                 <button type="submit" class="btn btn-outline-danger" title="Eliminar">
                   <i class="bi bi-trash"></i>
@@ -210,6 +210,10 @@ const rolesDesc = {
 
 function mostrarDescRol(sel, descId) {
   document.getElementById(descId).textContent = rolesDesc[sel.value] || '';
+}
+
+function confirmarEliminar(nombre) {
+  return confirm('¿Eliminar usuario "' + nombre + '"? Esta acción no se puede deshacer.');
 }
 
 function abrirEditar(u) {
