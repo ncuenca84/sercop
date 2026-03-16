@@ -790,6 +790,29 @@ class ProcesosController extends BaseController
         exit;
     }
 
+    // ── Generar secciones del documento con IA (endpoint AJAX) ───────────
+    public function generarDocumentoConIa(string $id): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+        try {
+            $proceso = Proceso::conInstitucion((int)$id);
+            if (!$proceso) {
+                echo json_encode(['ok' => false, 'error' => 'Proceso no encontrado.']);
+                exit;
+            }
+
+            $tipo        = trim($_POST['tipo']         ?? 'informe_tecnico');
+            $promptExtra = trim($_POST['prompt_extra'] ?? '');
+
+            $secciones = IaService::generarSeccionesDocumento($tipo, $proceso, $promptExtra);
+
+            echo json_encode(['ok' => true, 'secciones' => $secciones], JSON_UNESCAPED_UNICODE);
+        } catch (\Throwable $e) {
+            echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
     // ── Descargar documento como PDF (mPDF) ──────────────────────────────
     public function descargarDocumentoPdf(string $id): void
     {

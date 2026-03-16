@@ -28,9 +28,10 @@ $r->post('/procesos/{id}/fase2',            'ProcesosController@storeFase2',    
 $r->post('/procesos/{id}/estado',           'ProcesosController@cambiarEstado',  ['AuthMiddleware']);
 $r->post('/procesos/{id}/eliminar',         'ProcesosController@destroy',        ['AuthMiddleware']);
 $r->get('/procesos/{id}/documento',         'ProcesosController@generarDocumento',['AuthMiddleware']);
-$r->get('/procesos/{id}/documento/editar',  'ProcesosController@editarDocumento',  ['AuthMiddleware']);
-$r->post('/procesos/{id}/documento/generar','ProcesosController@generarDocumento', ['AuthMiddleware']);
-$r->get('/procesos/{id}/documento/pdf',     'ProcesosController@descargarDocumentoPdf',['AuthMiddleware']);
+$r->get('/procesos/{id}/documento/editar',     'ProcesosController@editarDocumento',      ['AuthMiddleware']);
+$r->post('/procesos/{id}/documento/generar',   'ProcesosController@generarDocumento',     ['AuthMiddleware']);
+$r->post('/procesos/{id}/documento/generar-ia','ProcesosController@generarDocumentoConIa',['AuthMiddleware']);
+$r->get('/procesos/{id}/documento/pdf',        'ProcesosController@descargarDocumentoPdf',['AuthMiddleware']);
 
 // ── Documentos del proceso ─────────────────────────────────────────────────
 $r->post('/procesos/{id}/documentos',             'DocumentosProcesoController@upload',   ['AuthMiddleware']);

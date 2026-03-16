@@ -15,7 +15,59 @@
 <style>
 .ck-editor__editable { min-height: 120px; }
 .ck-editor__editable img { max-width: 100%; height: auto; }
+#panelIa { display: none; }
+#panelIa.visible { display: block; }
 </style>
+
+<!-- ── Selector de modo ─────────────────────────────────────────────── -->
+<div class="d-flex gap-2 mb-3">
+  <button type="button" id="btnModoManual" class="btn btn-primary btn-sm"
+          onclick="setModo('manual')">
+    <i class="bi bi-pencil-square me-1"></i>Manual
+  </button>
+  <button type="button" id="btnModoIa" class="btn btn-outline-primary btn-sm"
+          onclick="setModo('ia')">
+    <i class="bi bi-stars me-1"></i>Generar con IA
+  </button>
+</div>
+
+<!-- ── Panel IA ──────────────────────────────────────────────────────── -->
+<div id="panelIa" class="card border-primary shadow-sm mb-3">
+  <div class="card-header bg-primary text-white fw-semibold small">
+    <i class="bi bi-stars me-1"></i>Generación con IA
+  </div>
+  <div class="card-body">
+
+    <!-- Contexto que se enviará -->
+    <p class="small text-muted mb-2">
+      La IA usará los datos técnicos del proceso para redactar el contenido:
+      <strong><?= e(mb_substr($proceso['objeto_contratacion'],0,80)) ?></strong>
+      — Monto: <strong>$<?= number_format((float)($proceso['monto_total']??0),2) ?></strong>
+      — Plazo: <strong><?= (int)($proceso['plazo_dias']??0) ?> días</strong>.
+      <br><em class="text-success">No se envían firmas, datos del administrador ni información ya definida en la plantilla.</em>
+    </p>
+
+    <label class="form-label fw-semibold small">
+      Instrucciones adicionales para la IA <span class="text-muted fw-normal">(opcional)</span>
+    </label>
+    <textarea id="iaPromptExtra" class="form-control form-control-sm mb-3" rows="2"
+              placeholder="Ej: enfócate en el aspecto ambiental, menciona que se cumplieron los 3 entregables, el servicio fue de capacitación presencial..."></textarea>
+
+    <button type="button" id="btnGenerarIa" class="btn btn-primary" onclick="generarConIa()">
+      <i class="bi bi-stars me-1"></i>Generar contenido
+    </button>
+    <button type="button" id="btnGenerarIaLoading" class="btn btn-primary d-none" disabled>
+      <span class="spinner-border spinner-border-sm me-1"></span>Generando…
+    </button>
+
+    <div id="iaError" class="alert alert-danger mt-2 d-none small"></div>
+    <div id="iaOk" class="alert alert-success mt-2 d-none small">
+      <i class="bi bi-check-circle me-1"></i>
+      Contenido generado. Revísalo en los editores y ajusta lo que necesites antes de generar el documento.
+    </div>
+
+  </div>
+</div>
 
 <div class="row g-3">
   <!-- Columna izquierda: formulario -->
@@ -140,10 +192,10 @@
         <i class="bi bi-lightbulb me-1 text-warning"></i>Instrucciones
       </div>
       <div class="card-body small text-muted">
+        <p><i class="bi bi-stars text-primary me-1"></i>Usa <strong>Generar con IA</strong> para que la IA redacte el contenido técnico del documento en base a los datos del proceso.</p>
+        <p><i class="bi bi-pencil text-secondary me-1"></i>Con <strong>Manual</strong> puedes escribir o editar directamente en los editores.</p>
         <p><i class="bi bi-fonts text-primary me-1"></i>Puedes usar <strong>negrita, cursiva, listas</strong> en los editores.</p>
-        <p><i class="bi bi-image text-success me-1"></i>Para insertar una imagen: haz clic en el botón <strong>������</strong> en la barra del editor, o simplemente <strong>pega</strong> (Ctrl+V) una imagen copiada.</p>
-        <p><i class="bi bi-eye me-1"></i>Haz clic en <em>"Generar y Ver Documento"</em> — se abre en pestaña nueva.</p>
-        <p><i class="bi bi-file-pdf me-1"></i>Usa <strong>"⬇ Descargar PDF"</strong> o <strong>Ctrl+P → Guardar como PDF</strong>.</p>
+        <p><i class="bi bi-image text-success me-1"></i>Para insertar una imagen: botón <strong>🖼</strong> en la barra o pega (Ctrl+V).</p>
         <p class="mb-0"><i class="bi bi-folder me-1"></i>El documento queda guardado en el Expediente Digital.</p>
       </div>
     </div>
@@ -197,9 +249,82 @@ ClassicEditor.create(document.getElementById('editorObs'), ckConfig)
   .then(e => { ckObs = e; }).catch(console.error);
 
 // Antes de enviar: sincronizar CKEditors → hidden inputs
-document.getElementById('formDocumento').addEventListener('submit', function(e) {
+document.getElementById('formDocumento').addEventListener('submit', function() {
   document.getElementById('hEspec').value = ckEspec ? ckEspec.getData() : '';
   document.getElementById('hMetod').value = ckMetod ? ckMetod.getData() : '';
   document.getElementById('hObs').value   = ckObs   ? ckObs.getData()   : '';
 });
+
+// ── Selector de modo ─────────────────────────────────────────────────────
+function setModo(modo) {
+  const panelIa    = document.getElementById('panelIa');
+  const btnManual  = document.getElementById('btnModoManual');
+  const btnIa      = document.getElementById('btnModoIa');
+
+  if (modo === 'ia') {
+    panelIa.classList.add('visible');
+    btnIa.classList.replace('btn-outline-primary', 'btn-primary');
+    btnManual.classList.replace('btn-primary', 'btn-outline-primary');
+  } else {
+    panelIa.classList.remove('visible');
+    btnManual.classList.replace('btn-outline-primary', 'btn-primary');
+    btnIa.classList.replace('btn-primary', 'btn-outline-primary');
+  }
+}
+
+// ── Llamada AJAX para generar con IA ─────────────────────────────────────
+function generarConIa() {
+  const btn        = document.getElementById('btnGenerarIa');
+  const btnLoading = document.getElementById('btnGenerarIaLoading');
+  const errDiv     = document.getElementById('iaError');
+  const okDiv      = document.getElementById('iaOk');
+  const promptExtra = document.getElementById('iaPromptExtra').value.trim();
+
+  btn.classList.add('d-none');
+  btnLoading.classList.remove('d-none');
+  errDiv.classList.add('d-none');
+  okDiv.classList.add('d-none');
+
+  const csrfToken = document.querySelector('input[name="_csrf"]')?.value ?? '';
+  const tipo      = document.querySelector('input[name="tipo"]').value;
+  const procesoId = <?= (int)$proceso['id'] ?>;
+
+  const body = new URLSearchParams({
+    _csrf:        csrfToken,
+    tipo:         tipo,
+    prompt_extra: promptExtra,
+  });
+
+  fetch(`/procesos/${procesoId}/documento/generar-ia`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.classList.remove('d-none');
+    btnLoading.classList.add('d-none');
+
+    if (!data.ok) {
+      errDiv.textContent = 'Error: ' + (data.error ?? 'respuesta inesperada');
+      errDiv.classList.remove('d-none');
+      return;
+    }
+
+    const s = data.secciones;
+    if (ckEspec && s.especificaciones_tecnicas) ckEspec.setData(s.especificaciones_tecnicas);
+    if (ckMetod && s.metodologia_trabajo)       ckMetod.setData(s.metodologia_trabajo);
+    if (ckObs   && s.observaciones)             ckObs.setData(s.observaciones);
+
+    okDiv.classList.remove('d-none');
+    // Cambiar a modo manual para que el usuario revise y edite
+    setModo('manual');
+  })
+  .catch(err => {
+    btn.classList.remove('d-none');
+    btnLoading.classList.add('d-none');
+    errDiv.textContent = 'Error de red: ' + err.message;
+    errDiv.classList.remove('d-none');
+  });
+}
 </script>

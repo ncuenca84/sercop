@@ -186,4 +186,117 @@ PROMPT;
         $decoded = json_decode($response, true);
         return $decoded['choices'][0]['message']['content'] ?? '';
     }
+
+    // ── Generar secciones de contenido para documentos Fase 3 ─────────────
+    // Retorna array con las 3 secciones editables del documento:
+    // especificaciones_tecnicas, metodologia_trabajo, observaciones
+    // NO genera firmas, encabezados ni datos administrativos (esos van en la plantilla)
+    public static function generarSeccionesDocumento(string $tipo, array $proceso, string $promptExtra = ''): array
+    {
+        if (empty(OPENROUTER_KEY)) {
+            throw new \RuntimeException('OPENROUTER_KEY no configurada.');
+        }
+
+        // Solo datos técnicos del proceso — excluir firmantes, logos y datos de admin
+        // porque ya están pre-definidos en la plantilla del documento
+        $datos = [
+            'numero_proceso'   => $proceso['numero_proceso']                           ?? '',
+            'objeto'           => $proceso['objeto_contratacion']                      ?? '',
+            'monto_usd'        => $proceso['monto_total']                              ?? '',
+            'plazo_dias'       => $proceso['plazo_dias']                               ?? '',
+            'tipo_proceso'     => $proceso['tipo_proceso']                             ?? '',
+            'cpc'              => $proceso['cpc']                                      ?? '',
+            'especificaciones' => strip_tags($proceso['especificaciones_tecnicas']     ?? ''),
+            'metodologia'      => strip_tags($proceso['metodologia_trabajo']           ?? ''),
+            'forma_pago'       => strip_tags($proceso['forma_pago']                    ?? ''),
+        ];
+
+        $titulos = [
+            'informe_tecnico'    => 'Informe Técnico de Entrega',
+            'garantia_tecnica'   => 'Certificado de Garantía Técnica',
+            'acta_provisional'   => 'Acta de Entrega-Recepción Provisional',
+            'acta_definitiva'    => 'Acta de Entrega-Recepción Definitiva',
+            'solicitud_pago'     => 'Solicitud de Pago',
+            'informe_conformidad'=> 'Informe de Conformidad',
+        ];
+
+        // Instrucciones específicas por tipo de documento para cada sección
+        $instrucciones = [
+            'informe_tecnico'    => 'especificaciones_tecnicas: descripción técnica de los trabajos realizados y cumplimiento de especificaciones. metodologia_trabajo: procedimiento y actividades ejecutadas durante la prestación. observaciones: antecedentes, conclusiones y recomendaciones finales.',
+            'acta_provisional'   => 'especificaciones_tecnicas: entregables recibidos y verificación de su estado. metodologia_trabajo: proceso de recepción y verificación realizado. observaciones: condiciones de la entrega provisional y aspectos pendientes.',
+            'acta_definitiva'    => 'especificaciones_tecnicas: confirmación del cumplimiento total de especificaciones y entregables. metodologia_trabajo: proceso de verificación final realizado. observaciones: cierre del contrato, liberación de garantías y obligaciones.',
+            'garantia_tecnica'   => 'especificaciones_tecnicas: alcance y cobertura de la garantía técnica ofrecida. metodologia_trabajo: procedimiento para hacer válida la garantía. observaciones: exclusiones, condiciones especiales y vigencia.',
+            'solicitud_pago'     => 'especificaciones_tecnicas: entregables y servicios ejecutados por los que se solicita el pago. metodologia_trabajo: sustento técnico y documentos de respaldo del cobro. observaciones: referencias a contratos, facturas y documentos adjuntos.',
+            'informe_conformidad'=> 'especificaciones_tecnicas: verificación del cumplimiento de requisitos técnicos contratados. metodologia_trabajo: criterios de evaluación y proceso de verificación aplicado. observaciones: emisión formal de conformidad y recomendaciones.',
+        ];
+
+        $instruccion   = $instrucciones[$tipo] ?? 'Redacta el contenido técnico apropiado para cada sección.';
+        $tituloDoc     = $titulos[$tipo]       ?? ucfirst(str_replace('_', ' ', $tipo));
+        $datosJson     = json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $extra         = $promptExtra !== '' ? "\n\nINSTRUCCIONES ADICIONALES: {$promptExtra}" : '';
+
+        $prompt = "Eres un experto en contratación pública ecuatoriana (LOSNCP). "
+                . "Genera el contenido técnico para un documento \"{$tituloDoc}\".\n\n"
+                . "DATOS DEL PROCESO:\n{$datosJson}\n\n"
+                . "INSTRUCCIONES POR SECCIÓN:\n{$instruccion}{$extra}\n\n"
+                . "REGLAS:\n"
+                . "- Redacta SOLO el contenido de las 3 secciones. Sin encabezados, sin firmas, sin estructura del documento.\n"
+                . "- Lenguaje formal técnico-legal ecuatoriano.\n"
+                . "- HTML simple: solo <p>, <strong>, <ul>, <li>, <ol>. Sin CSS inline.\n"
+                . "- Responde ÚNICAMENTE con JSON válido, sin markdown ni texto adicional:\n"
+                . '{"especificaciones_tecnicas":"<p>...</p>","metodologia_trabajo":"<p>...</p>","observaciones":"<p>...</p>"}';
+
+        $payload = json_encode([
+            'model'       => OPENROUTER_MODEL,
+            'messages'    => [['role' => 'user', 'content' => $prompt]],
+            'temperature' => 0.3,
+            'max_tokens'  => 3000,
+        ], JSON_UNESCAPED_UNICODE);
+
+        $ch = curl_init(OPENROUTER_URL);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_TIMEOUT        => 90,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . OPENROUTER_KEY,
+                'HTTP-Referer: ' . APP_URL,
+                'X-Title: ' . APP_NAME,
+            ],
+        ]);
+        $response  = curl_exec($ch);
+        $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlError)       throw new \RuntimeException("Error cURL: {$curlError}");
+        if ($httpCode !== 200) throw new \RuntimeException("OpenRouter error HTTP {$httpCode}");
+
+        $decoded = json_decode($response, true);
+        $content = $decoded['choices'][0]['message']['content'] ?? '';
+
+        // Limpiar bloques markdown si el modelo los añade
+        $content = preg_replace('/^```(?:json)?\s*/i', '', trim($content));
+        $content = preg_replace('/\s*```$/', '', $content);
+        $content = trim($content);
+
+        $secciones = json_decode($content, true);
+
+        if (!is_array($secciones)) {
+            preg_match('/\{.*\}/s', $content, $m);
+            if (!empty($m[0])) $secciones = json_decode($m[0], true);
+        }
+
+        if (!is_array($secciones)) {
+            throw new \RuntimeException('La IA no retornó JSON válido. Respuesta: ' . mb_substr($content, 0, 200));
+        }
+
+        return [
+            'especificaciones_tecnicas' => $secciones['especificaciones_tecnicas'] ?? '',
+            'metodologia_trabajo'       => $secciones['metodologia_trabajo']       ?? '',
+            'observaciones'             => $secciones['observaciones']             ?? '',
+        ];
+    }
 }
