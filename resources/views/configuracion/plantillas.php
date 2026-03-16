@@ -11,7 +11,6 @@
 <div class="row g-3 mb-4">
   <?php
   $tiposStd = [
-    'aceptacion_oc'      => ['📋','Aceptación de Orden de Compra','bg-primary'],
     'informe_tecnico'    => ['📄','Informe Técnico de Entrega','bg-info'],
     'garantia_tecnica'   => ['🛡️','Certificado de Garantía Técnica','bg-warning'],
     'acta_provisional'   => ['📝','Acta Entrega Provisional','bg-secondary'],

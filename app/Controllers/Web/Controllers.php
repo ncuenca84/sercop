@@ -699,8 +699,6 @@ class ProcesosController extends BaseController
 
         $tipo    = $this->input('tipo', 'informe_tecnico');
         $titulos = [
-            'proforma_sercop'    => 'Proforma para SERCOP',
-            'aceptacion_oc'      => 'Aceptación de Orden de Compra',
             'informe_tecnico'    => 'Informe Técnico de Entrega',
             'garantia_tecnica'   => 'Certificado de Garantía Técnica',
             'acta_provisional'   => 'Acta de Entrega Provisional',
@@ -794,8 +792,6 @@ class ProcesosController extends BaseController
         $html    = str_replace(['{{url_back}}','{{url_pdf}}'], ["/procesos/{$id}", '#'], $html);
 
         $titulos = [
-            'proforma_sercop'    => 'Proforma',
-            'aceptacion_oc'      => 'AceptacionOC',
             'informe_tecnico'    => 'InformeTecnico',
             'garantia_tecnica'   => 'Garantia',
             'acta_provisional'   => 'ActaProvisional',

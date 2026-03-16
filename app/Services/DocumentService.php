@@ -17,7 +17,6 @@ class DocumentoService
             case 'informe_tecnico':    return self::renderizar(self::tplInformeTecnico(),    $vars, $proceso);
             case 'acta_provisional':   return self::renderizar(self::tplActaEntrega('Provisional'), $vars, $proceso);
             case 'acta_definitiva':    return self::renderizar(self::tplActaEntrega('Definitiva'),  $vars, $proceso);
-            case 'aceptacion_oc':      return self::renderizar(self::tplAceptacionOC(),      $vars, $proceso);
             case 'garantia_tecnica':   return self::renderizar(self::tplGarantiaTecnica(),   $vars, $proceso);
             case 'solicitud_pago':     return self::renderizar(self::tplSolicitudPago(),     $vars, $proceso);
             case 'informe_conformidad':return self::renderizar(self::tplInformeConformidad(),$vars, $proceso);
@@ -385,70 +384,6 @@ class DocumentoService
                     <div class="firma-linea">
                         <div class="firma-nombre">{{institucion.administrador}}</div>
                         <div class="firma-cargo">{{institucion.cargo_admin}}<br>{{institucion.nombre}}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-doc">Documento generado por sistema Brixs Contratación — {{doc.fecha}}</div>
-        </div></body></html>';
-    }
-
-    // ── Aceptación de Orden de Compra ─────────────────────────────────────
-    private static function tplAceptacionOC(): string
-    {
-        return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-        <title>Aceptación OC — {{proceso.numero}}</title>'
-        . self::css() . '</head><body>'
-        . self::btnBar('Aceptación de Orden de Compra')
-        . '<div class="page">
-            <div class="doc-header">
-                <div class="doc-header-left">{{logo_html}}</div>
-                <div class="doc-header-right">
-                    <div class="doc-title">Aceptación de Orden de Compra</div>
-                    <div class="doc-numero">N° {{doc.numero}} &nbsp;|&nbsp; {{doc.lugar}}, {{doc.fecha}}</div>
-                </div>
-            </div>
-
-            <div class="doc-meta"><table>
-                <tr><td>Proceso NIC:</td><td>{{proceso.numero}}</td></tr>
-                <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
-                <tr><td>Institución:</td><td>{{institucion.nombre}}</td></tr>
-                <tr><td>Monto:</td><td>{{proceso.monto}}</td></tr>
-                <tr><td>Plazo:</td><td>{{proceso.plazo}}</td></tr>
-            </table></div>
-
-            <div class="seccion">
-                <div class="seccion-body">
-                    <strong>{{doc.lugar}}, {{doc.fecha}}</strong><br><br>
-                    Señor(a)<br>
-                    <strong>{{institucion.administrador}}</strong><br>
-                    {{institucion.cargo_admin}}<br>
-                    <strong>{{institucion.nombre}}</strong><br>
-                    Presente.–<br><br>
-
-                    De mi consideración:<br><br>
-
-                    Yo, <strong>{{proveedor.representante}}</strong>, en calidad de Representante Legal de
-                    <strong>{{proveedor.razon_social}}</strong>, con RUC <strong>{{proveedor.ruc}}</strong>,
-                    me dirijo a usted para hacer constar formalmente la <strong>aceptación de la Orden de Compra</strong>
-                    N° <strong>{{doc.numero}}</strong> correspondiente al proceso de contratación
-                    <strong>{{proceso.numero}}</strong>, cuyo objeto es <strong>{{proceso.objeto}}</strong>.<br><br>
-
-                    Mi representada se compromete a cumplir con todas las especificaciones técnicas,
-                    plazos y condiciones establecidas en el proceso de contratación, en el plazo de
-                    <strong>{{proceso.plazo}}</strong> contados a partir de la notificación de la orden de compra.<br><br>
-
-                    La forma de pago acordada es: <strong>{{proceso.forma_pago}}</strong>.<br><br>
-
-                    {{doc.observaciones}}
-                </div>
-            </div>
-
-            <div class="firma-section">
-                <div class="firma-box">
-                    <div class="firma-linea">
-                        <div class="firma-nombre">{{proveedor.representante}}</div>
-                        <div class="firma-cargo">Representante Legal<br>{{proveedor.razon_social}}<br>RUC: {{proveedor.ruc}}</div>
                     </div>
                 </div>
             </div>
