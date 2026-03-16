@@ -752,11 +752,25 @@ class ProcesosController extends BaseController
         $html = str_replace('{{url_back}}',     "/procesos/{$id}",                    $html);
         $html = str_replace('{{url_pdf}}',      "/procesos/{$id}/documento/pdf?tipo={$tipo}", $html);
 
-        // Guardar en expediente
+        // Guardar en expediente (solo última versión generada)
         try {
             $cat      = $this->categoriaPorTipo($tipo);
             $dir      = tenantStoragePath("procesos/{$id}/{$cat}");
             if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+            // Eliminar versiones anteriores auto-generadas del mismo tipo
+            $anteriores = \DB::select(
+                "SELECT id, ruta_storage FROM documentos_proceso
+                 WHERE proceso_id = ? AND categoria = ? AND es_generado = 1 AND deleted_at IS NULL AND tenant_id = ?",
+                [(int)$id, $cat, tenantId()]
+            );
+            foreach ($anteriores as $ant) {
+                if (!empty($ant['ruta_storage']) && file_exists($ant['ruta_storage'])) {
+                    @unlink($ant['ruta_storage']);
+                }
+                \DB::query("UPDATE documentos_proceso SET deleted_at = NOW() WHERE id = ?", [$ant['id']]);
+            }
+
             $filename = $tipo . '_' . date('Ymd_His') . '.html';
             file_put_contents($dir . '/' . $filename, $html);
             DocumentoProceso::create([
@@ -1508,10 +1522,24 @@ class ProformaController extends BaseController
         $html = str_replace('{{url_back}}',     "/procesos/{$id}",          $html);
         $html = str_replace('{{url_back_pdf}}', "/procesos/{$id}/proforma/pdf", $html);
 
-        // Guardar copia en expediente digital
+        // Guardar copia en expediente digital (solo última versión generada)
         try {
             $dir      = tenantStoragePath("procesos/{$id}/proforma");
             if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+            // Eliminar versiones anteriores auto-generadas de la proforma
+            $anteriores = \DB::select(
+                "SELECT id, ruta_storage FROM documentos_proceso
+                 WHERE proceso_id = ? AND categoria = 'proforma' AND es_generado = 1 AND deleted_at IS NULL AND tenant_id = ?",
+                [(int)$id, tenantId()]
+            );
+            foreach ($anteriores as $ant) {
+                if (!empty($ant['ruta_storage']) && file_exists($ant['ruta_storage'])) {
+                    @unlink($ant['ruta_storage']);
+                }
+                \DB::query("UPDATE documentos_proceso SET deleted_at = NOW() WHERE id = ?", [$ant['id']]);
+            }
+
             $filename = 'proforma_' . date('Ymd_His') . '.html';
             file_put_contents($dir . '/' . $filename, $html);
             DocumentoProceso::create([
