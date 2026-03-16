@@ -143,14 +143,14 @@ class DocumentoService
             </tr>';
         }
 
-        return '<table style="width:100%;border-collapse:collapse;font-size:11px">
-            <thead><tr style="background:#f0f0f0">
-                <th style="border:1px solid #ccc;padding:4px">N°</th>
-                <th style="border:1px solid #ccc;padding:4px">Entregable</th>
-                <th style="border:1px solid #ccc;padding:4px">Descripción</th>
-                <th style="border:1px solid #ccc;padding:4px">Fecha</th>
-                <th style="border:1px solid #ccc;padding:4px">Monto</th>
-                <th style="border:1px solid #ccc;padding:4px">Estado</th>
+        return '<table>
+            <thead><tr>
+                <th style="width:5%;text-align:center">N°</th>
+                <th>Entregable</th>
+                <th>Descripción</th>
+                <th style="width:12%;text-align:center">Fecha</th>
+                <th style="width:12%;text-align:right">Monto</th>
+                <th style="width:10%;text-align:center">Estado</th>
             </tr></thead>
             <tbody>' . $rows . '</tbody>
         </table>';
@@ -162,34 +162,57 @@ class DocumentoService
         return "
         <style>
             * { margin:0; padding:0; box-sizing:border-box; }
-            body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #222; background: #f5f5f5; }
-            .page { background: #fff; max-width: 210mm; margin: 0 auto; padding: 20mm 20mm 25mm 20mm; min-height: 297mm; position: relative; }
+            body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #1a1a1a; background: #f0f2f5; }
+            .page { background: #fff; max-width: 210mm; margin: 0 auto; padding: 20mm 20mm 25mm 20mm; min-height: 297mm; position: relative; box-shadow: 0 2px 12px rgba(0,0,0,.12); }
             .doc-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid {$color}; padding-bottom: 12px; margin-bottom: 20px; }
             .doc-header-left { flex: 1; }
             .doc-header-right { text-align: right; }
-            .doc-title { font-size: 15pt; font-weight: bold; color: {$color}; margin: 14px 0 4px; text-transform: uppercase; }
-            .doc-numero { font-size: 10pt; color: #555; }
+            .doc-title { font-size: 13pt; font-weight: bold; color: {$color}; margin: 10px 0 4px; text-transform: uppercase; }
+            .doc-numero { font-size: 9pt; color: #555; }
             .doc-meta { background: #f8f9fa; border-left: 4px solid {$color}; padding: 10px 14px; margin: 16px 0; border-radius: 0 4px 4px 0; }
             .doc-meta table { width: 100%; border-collapse: collapse; }
-            .doc-meta td { padding: 3px 8px; font-size: 10pt; }
+            .doc-meta td { padding: 3px 8px; font-size: 9.5pt; }
             .doc-meta td:first-child { font-weight: bold; color: #555; width: 35%; }
-            .seccion { margin: 18px 0; }
-            .seccion-titulo { font-size: 11pt; font-weight: bold; color: {$color}; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-            .seccion-body { font-size: 10.5pt; line-height: 1.6; text-align: justify; }
+            .seccion { margin: 14px 0; }
+            .seccion-titulo { background: {$color}; color: #fff; font-weight: bold; font-size: 9pt; padding: 4px 8px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .seccion-body { font-size: 9.5pt; line-height: 1.6; text-align: justify; }
+            /* Tablas de datos (entregables, items) */
+            table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 9pt; }
+            thead tr { background: {$color}; color: #fff; }
+            thead th { padding: 5px 6px; text-align: left; }
+            tbody tr:nth-child(even) { background: #f5f7fa; }
+            tbody td { padding: 5px 6px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+            /* Tablas generadas por CKEditor (pegadas desde Excel/Word) */
+            .seccion-body table, .ck-content table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 9pt; }
+            .seccion-body table td, .seccion-body table th,
+            .ck-content table td, .ck-content table th { border: 1px solid #ccc; padding: 4px 6px; vertical-align: top; }
+            .seccion-body table thead td, .seccion-body table th,
+            .ck-content table thead td, .ck-content table th { background: {$color}; color: #fff; font-weight: bold; }
+            .seccion-body ul, .seccion-body ol, .ck-content ul, .ck-content ol { margin: 4px 0 4px 18px; padding: 0; }
+            .seccion-body li, .ck-content li { margin-bottom: 2px; }
+            .seccion-body p, .ck-content p { margin-bottom: 4px; }
+            .ck-content figure.table { margin: 6px 0; width: 100%; }
+            .ck-content figure.table table { width: 100%; }
+            /* Firma */
             .firma-section { margin-top: 40px; display: flex; justify-content: space-around; }
             .firma-box { text-align: center; width: 200px; }
             .firma-linea { border-top: 1px solid #333; margin-top: 50px; padding-top: 6px; }
             .firma-nombre { font-weight: bold; font-size: 10pt; }
             .firma-cargo { font-size: 9pt; color: #555; }
-            .footer-doc { position: fixed; bottom: 10mm; left: 20mm; right: 20mm; text-align: center; font-size: 8pt; color: #aaa; border-top: 1px solid #eee; padding-top: 4px; }
-            .btn-bar { position: fixed; top: 0; left: 0; right: 0; background: #1B4F72; color: #fff; padding: 8px 20px; display: flex; gap: 10px; align-items: center; z-index: 9999; }
-            .btn-bar a, .btn-bar button { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; text-decoration: none; }
-            .btn-bar a:hover, .btn-bar button:hover { background: rgba(255,255,255,0.35); }
-            .btn-bar .spacer { flex: 1; }
+            .footer-doc { margin-top: 20px; padding-top: 6px; border-top: 1px solid #ddd; text-align: center; font-size: 8pt; color: #aaa; }
+            /* Toolbar de pantalla */
+            .btn-bar { position: fixed; top: 0; left: 0; right: 0; background: {$color}; color: #fff; padding: 10px 20px; display: flex; gap: 10px; align-items: center; z-index: 9999; }
+            .btn-bar-back { background: transparent; color: #ccc; border: 1px solid #555; padding: 6px 14px; border-radius: 4px; font-size: 9pt; text-decoration: none; }
+            .btn-bar-titulo { font-size: 11pt; font-weight: bold; }
+            .btn-bar-sub { font-size: 8pt; color: #aaa; }
+            .btn-bar-spacer { flex: 1; }
+            .btn-bar-print { background: #27ae60; color: #fff; border: none; padding: 7px 16px; border-radius: 4px; cursor: pointer; font-size: 10pt; font-weight: bold; }
+            .btn-bar-pdf { background: #c0392b; color: #fff; border: none; padding: 7px 16px; border-radius: 4px; cursor: pointer; font-size: 10pt; font-weight: bold; text-decoration: none; display: inline-block; }
+            @media screen { body { padding-top: 55px; } }
             @media print {
-                body { background: #fff; }
+                body { background: #fff; padding-top: 0; }
+                .page { box-shadow: none; }
                 .btn-bar { display: none !important; }
-                .footer-doc { position: fixed; }
             }
         </style>";
     }
@@ -198,12 +221,15 @@ class DocumentoService
     private static function btnBar(string $titulo): string
     {
         return '<div class="btn-bar">
-            <a href="{{url_back}}">← Volver</a>
-            <span style="font-size:13px;font-weight:bold">' . htmlspecialchars($titulo) . '</span>
-            <div class="spacer"></div>
-            <a href="{{url_pdf}}" title="Descargar PDF">⬇ Descargar PDF</a>
-            <button onclick="window.print()">������ Imprimir / PDF</button>
-        </div><div style="height:45px"></div>';
+            <a href="{{url_back}}" class="btn-bar-back">&larr; Volver</a>
+            <div>
+                <div class="btn-bar-titulo">' . htmlspecialchars($titulo) . '</div>
+                <div class="btn-bar-sub">Lista para imprimir y firmar electr&oacute;nicamente</div>
+            </div>
+            <div class="btn-bar-spacer"></div>
+            <button class="btn-bar-print" onclick="window.print()">&#128424; Imprimir / Guardar PDF</button>
+            <a href="{{url_pdf}}" class="btn-bar-pdf">&#11015; Descargar PDF</a>
+        </div>';
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -438,7 +464,7 @@ class DocumentoService
         <title>Garantía Técnica — {{proceso.numero}}</title>'
         . self::css() . '</head><body>'
         . self::btnBar('Certificado de Garantía Técnica')
-        . '<div class="page" style="text-align:center">
+        . '<div class="page">
             <div class="doc-header">
                 <div class="doc-header-left">{{logo_html}}</div>
                 <div class="doc-header-right">
@@ -447,7 +473,7 @@ class DocumentoService
                 </div>
             </div>
 
-            <div style="margin: 30px 0; text-align:left">
+            <div style="margin: 30px 0">
                 <div class="doc-meta"><table>
                     <tr><td>Proceso:</td><td>{{proceso.numero}}</td></tr>
                     <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
