@@ -793,6 +793,7 @@ class ProcesosController extends BaseController
     // ── Generar secciones del documento con IA (endpoint AJAX) ───────────
     public function generarDocumentoConIa(string $id): void
     {
+        set_time_limit(120); // La llamada a la IA puede tardar más de 30s (límite del php.ini)
         header('Content-Type: application/json; charset=UTF-8');
         try {
             $proceso = Proceso::conInstitucion((int)$id);

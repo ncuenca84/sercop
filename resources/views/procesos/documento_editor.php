@@ -295,18 +295,27 @@ function generarConIa() {
     prompt_extra: promptExtra,
   });
 
+  // Timeout de 90s en el browser para no quedar colgado si PHP falla
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(() => controller.abort(), 90000);
+
   fetch(`/procesos/${procesoId}/documento/generar-ia`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
+    signal: controller.signal,
   })
-  .then(r => r.json())
+  .then(r => {
+    clearTimeout(timeoutId);
+    if (!r.ok) throw new Error('El servidor respondió con código ' + r.status);
+    return r.json();
+  })
   .then(data => {
     btn.classList.remove('d-none');
     btnLoading.classList.add('d-none');
 
     if (!data.ok) {
-      errDiv.textContent = 'Error: ' + (data.error ?? 'respuesta inesperada');
+      errDiv.textContent = 'Error: ' + (data.error ?? 'respuesta inesperada de la IA');
       errDiv.classList.remove('d-none');
       return;
     }
@@ -317,13 +326,16 @@ function generarConIa() {
     if (ckObs   && s.observaciones)             ckObs.setData(s.observaciones);
 
     okDiv.classList.remove('d-none');
-    // Cambiar a modo manual para que el usuario revise y edite
     setModo('manual');
   })
   .catch(err => {
+    clearTimeout(timeoutId);
     btn.classList.remove('d-none');
     btnLoading.classList.add('d-none');
-    errDiv.textContent = 'Error de red: ' + err.message;
+    const msg = err.name === 'AbortError'
+      ? 'La IA tardó demasiado (>90s). Intenta de nuevo.'
+      : 'Error: ' + err.message;
+    errDiv.textContent = msg;
     errDiv.classList.remove('d-none');
   });
 }
