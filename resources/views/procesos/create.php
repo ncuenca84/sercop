@@ -576,14 +576,3 @@ function actualizarJsonCreate() {
   input.value = JSON.stringify(data);
 }
 </script>
-
-<!-- DEBUG TEMPORAL — pegar HTML del SERCOP y ver qué extrae el parser -->
-<details class="mt-4">
-  <summary class="text-muted small" style="cursor:pointer">������ Diagnóstico del parser (temporal)</summary>
-  <form method="POST" action="/debug/sercop-html" target="_blank" class="mt-2">
-    <?= csrf_field() ?>
-    <textarea name="html_sercop" class="form-control form-control-sm mb-2" rows="4"
-              placeholder="Pega el HTML fuente aquí (Ctrl+U en la página SERCOP)"
-              style="font-family:monospace;font-size:11px"></textarea>
-    <button type="submit" class="btn btn-sm btn-outline-secondary">Ver diagnóstico (nueva pestaña)</button>
-  </form
