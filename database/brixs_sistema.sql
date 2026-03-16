@@ -627,7 +627,7 @@ CREATE TABLE `procesos` (
   `nota_espec_activa` tinyint(1) NOT NULL DEFAULT '1',
   `nota_espec_texto` text COLLATE utf8mb4_unicode_ci,
   `metodologia_trabajo` longtext COLLATE utf8mb4_unicode_ci,
-  `vigencia_oferta` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vigencia_oferta` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `alcance` longtext COLLATE utf8mb4_unicode_ci,
   `institucion_id` bigint unsigned NOT NULL,
   `monto_total` decimal(15,2) NOT NULL DEFAULT '0.00',

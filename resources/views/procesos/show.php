@@ -838,18 +838,13 @@ function cargarPlantilla(sel) {
 }
 </script>
 
-<!-- Quill.js — editor WYSIWYG open source, sin API key, excelente para tablas -->
-<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<!-- CKEditor 5 — editor WYSIWYG con soporte completo de tablas e imágenes -->
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css">
+<script src="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.umd.js"></script>
 <style>
-/* ── Overrides Quill para los editores del modal ── */
-.ql-container { font-size: 13px; }
-.ql-editor    { min-height: 160px; max-height: 400px; overflow-y: auto; }
-.ql-editor table { border-collapse: collapse; width: 100%; margin: 8px 0; }
-.ql-editor td, .ql-editor th { border: 1px solid #aaa; padding: 4px 8px; }
-.ql-editor th { background: #e8e8e8; font-weight: bold; }
-/* Editores en el formulario principal */
-.quill-fase2 .ql-editor { min-height: 220px; max-height: 500px; overflow-y: auto; }
+/* Editores CKEditor en formulario Fase 2 */
+.ck-editor__editable { min-height: 220px; max-height: 500px; overflow-y: auto; font-size: 13px; }
+.ck-editor__editable img { max-width: 100%; height: auto; }
 /* Sección card en modal */
 .seccion-card { border-left: 4px solid #dee2e6; transition: border-color .2s; }
 .seccion-card.seleccionada { border-left-color: #0d6efd; }
@@ -864,84 +859,83 @@ function cargarPlantilla(sel) {
 </style>
 <script>
 // ════════════════════════════════════════════════════════════════════════
-// QUILL — instancias para los 3 editores principales de Fase 2
+// CKEditor 5 — instancias para los 3 editores principales de Fase 2
 // ════════════════════════════════════════════════════════════════════════
-const quillConfig = {
-  theme: 'snow',
-  modules: {
-    toolbar: [
-      [{ header: [3, 4, false] }],
-      ['bold','italic','underline'],
-      [{ list: 'ordered' }, { list: 'bullet' }],
-      ['clean'],
+const { ClassicEditor, Essentials, Bold, Italic, Underline,
+        List, Paragraph, Heading, Table, TableToolbar,
+        Image, ImageUpload, ImageInsert, ImageResize, ImageToolbar, ImageCaption, ImageStyle,
+        Base64UploadAdapter, Link, BlockQuote, Indent } = CKEDITOR;
+
+const ckFase2Config = {
+  plugins: [
+    Essentials, Bold, Italic, Underline,
+    List, Paragraph, Heading, Table, TableToolbar,
+    Image, ImageUpload, ImageInsert, ImageResize, ImageToolbar, ImageCaption, ImageStyle,
+    Base64UploadAdapter, Link, BlockQuote, Indent
+  ],
+  toolbar: {
+    items: [
+      'heading', '|',
+      'bold', 'italic', 'underline', '|',
+      'bulletedList', 'numberedList', 'blockQuote', '|',
+      'insertImage', 'insertTable', 'link', '|',
+      'outdent', 'indent', '|',
+      'undo', 'redo'
     ]
-  }
+  },
+  image: {
+    toolbar: ['imageStyle:inline','imageStyle:block','|','toggleImageCaption','imageTextAlternative','|','resizeImage'],
+    resizeOptions: [
+      { name: 'resizeImage:original', value: null, label: 'Original' },
+      { name: 'resizeImage:50',       value: '50',  label: '50%' },
+      { name: 'resizeImage:75',       value: '75',  label: '75%' },
+    ],
+    upload: { types: ['jpeg','jpg','png','gif','webp'] }
+  },
+  table: { contentToolbar: ['tableColumn','tableRow','mergeTableCells'] }
 };
 
-// Reemplazar textareas con Quill — se hace en DOMContentLoaded
 let qEspec, qMetod, qPago;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Crear contenedores Quill reemplazando los textareas
-  ['ck_especificaciones','ck_metodologia','ck_forma_pago'].forEach(id => {
-    const ta  = document.getElementById(id);
+  const campos = [
+    { id: 'ck_especificaciones', assign: e => qEspec = e },
+    { id: 'ck_metodologia',      assign: e => qMetod = e },
+    { id: 'ck_forma_pago',       assign: e => qPago  = e },
+  ];
+
+  campos.forEach(({ id, assign }) => {
+    const ta = document.getElementById(id);
     if (!ta) return;
-    const wrap = document.createElement('div');
-    wrap.className = 'quill-fase2';
     const edDiv = document.createElement('div');
-    edDiv.id = 'q_' + id;
-    wrap.appendChild(edDiv);
-    ta.parentNode.insertBefore(wrap, ta);
+    edDiv.id = 'ckdiv_' + id;
+    ta.parentNode.insertBefore(edDiv, ta);
     ta.style.display = 'none';
 
-    const q = new Quill('#q_' + id, {
-      ...quillConfig,
-      modules: {
-        toolbar: [
-          [{ header: [3, 4, false] }],
-          ['bold','italic','underline'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [{ table: true }],
-          ['clean'],
-        ]
-      }
-    });
-
-    // Cargar valor inicial del textarea
-    if (ta.value.trim()) {
-      q.clipboard.dangerouslyPasteHTML(ta.value);
-    }
-
-    if (id === 'ck_especificaciones') qEspec = q;
-    if (id === 'ck_metodologia')      qMetod = q;
-    if (id === 'ck_forma_pago')        qPago  = q;
+    ClassicEditor.create(edDiv, ckFase2Config)
+      .then(editor => {
+        if (ta.value.trim()) editor.setData(ta.value);
+        assign(editor);
+      })
+      .catch(console.error);
   });
 });
 
-// Sync Quill → textarea antes de submit
+// Sync CKEditor → textarea antes de submit
 document.getElementById('formFase2').addEventListener('submit', function() {
   syncQuillFormato();
 });
 
 function syncQuillFormato() {
-  [
-    [qEspec, 'ck_especificaciones'],
-    [qMetod, 'ck_metodologia'],
-    [qPago,  'ck_forma_pago'],
-  ].forEach(([q, id]) => {
-    if (!q) return;
-    const ta = document.getElementById(id);
-    if (ta) ta.value = q.root.innerHTML;
-  });
+  if (qEspec) document.getElementById('ck_especificaciones').value = qEspec.getData();
+  if (qMetod) document.getElementById('ck_metodologia').value      = qMetod.getData();
+  if (qPago)  document.getElementById('ck_forma_pago').value       = qPago.getData();
 }
 
 function fillCkFields(d) {
-  if (qEspec && d.especificaciones_tecnicas)
-    qEspec.clipboard.dangerouslyPasteHTML(d.especificaciones_tecnicas);
-  if (qMetod && d.metodologia_trabajo)
-    qMetod.clipboard.dangerouslyPasteHTML(d.metodologia_trabajo);
-  if (qPago && d.forma_pago)
-    qPago.clipboard.dangerouslyPasteHTML(d.forma_pago);
+  if (qEspec && d.especificaciones_tecnicas) qEspec.setData(d.especificaciones_tecnicas);
+  if (qMetod && d.metodologia_trabajo)       qMetod.setData(d.metodologia_trabajo);
+  if (qPago  && d.forma_pago)                qPago.setData(d.forma_pago);
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1162,17 +1156,17 @@ function importarSeccionesSeleccionadas() {
     if (sec.campo_destino) {
       switch (sec.campo_destino) {
         case 'especificaciones_tecnicas':
-          if (qEspec) qEspec.clipboard.dangerouslyPasteHTML(html);
+          if (qEspec) qEspec.setData(html);
           else        document.getElementById('ck_especificaciones').value = html;
           importados.push('Especificaciones Técnicas');
           break;
         case 'metodologia_trabajo':
-          if (qMetod) qMetod.clipboard.dangerouslyPasteHTML(html);
+          if (qMetod) qMetod.setData(html);
           else        document.getElementById('ck_metodologia').value = html;
           importados.push('Metodología');
           break;
         case 'forma_pago':
-          if (qPago) qPago.clipboard.dangerouslyPasteHTML(html);
+          if (qPago) qPago.setData(html);
           else       document.getElementById('ck_forma_pago').value = html;
           importados.push('Forma de Pago');
           break;
