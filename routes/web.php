@@ -96,8 +96,11 @@ $r->post('/dominios/{id}/rdap-datos',       'DominiosController@rdapDatos',     
 // ── Configuración ─────────────────────────────────────────────────────────
 $r->get('/configuracion',                   'ConfiguracionController@index',         ['AuthMiddleware']);
 $r->post('/configuracion',                  'ConfiguracionController@update',        ['AuthMiddleware']);
-$r->get('/configuracion/usuarios',          'ConfiguracionController@usuarios',      ['AuthMiddleware']);
-$r->post('/configuracion/usuarios',         'ConfiguracionController@storeUsuario',  ['AuthMiddleware']);
+$r->get('/configuracion/usuarios',                      'ConfiguracionController@usuarios',       ['AuthMiddleware']);
+$r->post('/configuracion/usuarios',                     'ConfiguracionController@storeUsuario',   ['AuthMiddleware']);
+$r->post('/configuracion/usuarios/{id}',                'ConfiguracionController@updateUsuario',  ['AuthMiddleware']);
+$r->post('/configuracion/usuarios/{id}/toggle',         'ConfiguracionController@toggleUsuario',  ['AuthMiddleware']);
+$r->post('/configuracion/usuarios/{id}/eliminar',       'ConfiguracionController@destroyUsuario', ['AuthMiddleware']);
 $r->get('/configuracion/plantillas',        'ConfiguracionController@plantillas',    ['AuthMiddleware']);
 $r->post('/configuracion/plantillas',       'ConfiguracionController@storePlantilla',['AuthMiddleware']);
 

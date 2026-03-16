@@ -1441,8 +1441,69 @@ class ConfiguracionController extends BaseController
             'password' => 'required|min:8',
             'rol'      => 'required|in:admin,gestor,contador,visualizador',
         ]);
+        unset($data['_csrf'], $data['_method']);
         User::createUser($data);
-        View::flash('success', 'Usuario creado.');
+        View::flash('success', 'Usuario creado correctamente.');
+        $this->redirect('/configuracion/usuarios');
+    }
+
+    public function updateUsuario(int $id): void
+    {
+        $this->requirePermission('usuarios.*');
+        verifyCsrf();
+        $data = $this->validate([
+            'nombre' => 'required|max:150',
+            'email'  => 'required|email',
+            'rol'    => 'required|in:admin,gestor,contador,visualizador',
+            'estado' => 'required|in:activo,inactivo',
+        ]);
+        unset($data['_csrf'], $data['_method']);
+
+        // Cambio de contraseña opcional
+        $pw = trim($_POST['password'] ?? '');
+        if ($pw !== '') {
+            if (mb_strlen($pw) < 8) {
+                View::flash('error', 'La contraseña debe tener al menos 8 caracteres.');
+                $this->redirect('/configuracion/usuarios');
+                return;
+            }
+            $data['password_hash'] = Auth::hashPassword($pw);
+        }
+
+        User::update($id, $data);
+        View::flash('success', 'Usuario actualizado.');
+        $this->redirect('/configuracion/usuarios');
+    }
+
+    public function toggleUsuario(int $id): void
+    {
+        $this->requirePermission('usuarios.*');
+        verifyCsrf();
+        $usuario = User::find($id);
+        if (!$usuario) {
+            View::flash('error', 'Usuario no encontrado.');
+            $this->redirect('/configuracion/usuarios');
+            return;
+        }
+        $nuevoEstado = $usuario['estado'] === 'activo' ? 'inactivo' : 'activo';
+        User::update($id, ['estado' => $nuevoEstado]);
+        $msg = $nuevoEstado === 'activo' ? 'Usuario activado.' : 'Usuario desactivado.';
+        View::flash('success', $msg);
+        $this->redirect('/configuracion/usuarios');
+    }
+
+    public function destroyUsuario(int $id): void
+    {
+        $this->requirePermission('usuarios.*');
+        verifyCsrf();
+        // No permitir que un admin se elimine a sí mismo
+        if ($id === (int) Auth::id()) {
+            View::flash('error', 'No puedes eliminar tu propia cuenta.');
+            $this->redirect('/configuracion/usuarios');
+            return;
+        }
+        User::delete($id);
+        View::flash('success', 'Usuario eliminado.');
         $this->redirect('/configuracion/usuarios');
     }
 
