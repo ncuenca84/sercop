@@ -1,11 +1,10 @@
 <?php
 // Mapa de permisos por rol para mostrar en UI
 $rolesInfo = [
-    'super_admin'  => ['label'=>'Super Admin',  'color'=>'danger',   'icono'=>'shield-lock',   'permisos'=>'Acceso total al sistema'],
-    'admin'        => ['label'=>'Administrador','color'=>'primary',  'icono'=>'person-gear',   'permisos'=>'Procesos, documentos, facturas, pagos, usuarios, configuración, IA, reportes'],
-    'gestor'       => ['label'=>'Gestor',        'color'=>'success',  'icono'=>'briefcase',     'permisos'=>'Procesos, documentos, IA, reportes (solo ver facturas)'],
-    'contador'     => ['label'=>'Contador',      'color'=>'warning',  'icono'=>'calculator',    'permisos'=>'Facturas, pagos, reportes (solo ver procesos)'],
-    'visualizador' => ['label'=>'Visualizador',  'color'=>'secondary','icono'=>'eye',           'permisos'=>'Solo lectura: procesos, instituciones, facturas, reportes'],
+    'super_admin'  => ['label'=>'Super Admin',  'color'=>'danger',   'icono'=>'shield-lock', 'permisos'=>'Acceso total al sistema'],
+    'admin'        => ['label'=>'Administrador','color'=>'primary',  'icono'=>'person-gear', 'permisos'=>'Procesos, documentos, usuarios, configuración, IA y reportes'],
+    'gestor'       => ['label'=>'Gestor',        'color'=>'success',  'icono'=>'briefcase',   'permisos'=>'Procesos, documentos, IA y reportes (solo lectura en instituciones)'],
+    'visualizador' => ['label'=>'Visualizador',  'color'=>'secondary','icono'=>'eye',         'permisos'=>'Solo lectura: procesos, instituciones y reportes'],
 ];
 $usuarioActualId = Auth::id();
 ?>
@@ -141,7 +140,6 @@ $usuarioActualId = Auth::id();
             <option value="">-- Selecciona un rol --</option>
             <option value="admin">Administrador</option>
             <option value="gestor">Gestor de Contratos</option>
-            <option value="contador">Contador / Finanzas</option>
             <option value="visualizador">Visualizador (solo lectura)</option>
           </select>
           <div id="desc-nuevo" class="form-text text-muted mt-1"></div>
@@ -178,7 +176,6 @@ $usuarioActualId = Auth::id();
           <select name="rol" id="edit-rol" class="form-select" required onchange="mostrarDescRol(this,'desc-editar')">
             <option value="admin">Administrador</option>
             <option value="gestor">Gestor de Contratos</option>
-            <option value="contador">Contador / Finanzas</option>
             <option value="visualizador">Visualizador (solo lectura)</option>
           </select>
           <div id="desc-editar" class="form-text text-muted mt-1"></div>
@@ -206,10 +203,9 @@ $usuarioActualId = Auth::id();
 
 <script>
 const rolesDesc = {
-  admin:        'Acceso total excepto super administrador del sistema.',
-  gestor:       'Gestiona procesos, documentos e IA. Ve facturas pero no las edita.',
-  contador:     'Gestiona facturas y pagos. Solo ve procesos.',
-  visualizador: 'Solo lectura en procesos, instituciones, facturas y reportes.',
+  admin:        'Acceso total: procesos, documentos, usuarios, configuración, IA y reportes.',
+  gestor:       'Gestiona procesos y documentos. Puede usar IA y ver reportes.',
+  visualizador: 'Solo lectura en procesos, instituciones y reportes.',
 };
 
 function mostrarDescRol(sel, descId) {

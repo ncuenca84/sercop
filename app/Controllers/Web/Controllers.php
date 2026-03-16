@@ -1439,7 +1439,7 @@ class ConfiguracionController extends BaseController
             'nombre'   => 'required|max:150',
             'email'    => 'required|email',
             'password' => 'required|min:8',
-            'rol'      => 'required|in:admin,gestor,contador,visualizador',
+            'rol'      => 'required|in:admin,gestor,visualizador',
         ]);
         unset($data['_csrf'], $data['_method']);
         User::createUser($data);
@@ -1454,7 +1454,7 @@ class ConfiguracionController extends BaseController
         $data = $this->validate([
             'nombre' => 'required|max:150',
             'email'  => 'required|email',
-            'rol'    => 'required|in:admin,gestor,contador,visualizador',
+            'rol'    => 'required|in:admin,gestor,visualizador',
             'estado' => 'required|in:activo,inactivo',
         ]);
         unset($data['_csrf'], $data['_method']);
