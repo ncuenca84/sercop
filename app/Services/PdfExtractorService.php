@@ -252,16 +252,27 @@ class PdfExtractorService
             'declaracion_cumplimiento'  => null,
         ];
 
-        // ── 1. Texto con smalot/pdfparser ──────────────────────────────
+        // ── 1. Texto con smalot/pdfparser (lineal) ─────────────────────
         $textoPrincipal = self::extraerConSmalot($rutaPdf);
+
+        // ── 1b. Texto posicional smalot (mejor para tablas) ─────────────
+        $textoPosicional = self::extraerConSmalotPositional($rutaPdf);
 
         // ── 2. Texto con pdftotext -layout (mejor para tablas) ─────────
         $textoLayout = self::extraerConPdftotext($rutaPdf);
 
-        // Usamos el más largo como principal
-        $texto = (strlen($textoLayout) > strlen($textoPrincipal))
-            ? $textoLayout
-            : $textoPrincipal;
+        // Elegir el candidato más legible de los disponibles
+        $candidatos = array_filter(
+            [$textoLayout, $textoPosicional, $textoPrincipal],
+            fn($t) => mb_strlen(trim($t)) > 50
+        );
+        $texto = empty($candidatos)
+            ? ''
+            : array_reduce(
+                array_slice($candidatos, 1),
+                fn($mejor, $t) => self::elegirMejorTexto($mejor, $t),
+                reset($candidatos)
+            );
 
         // ── 3. Extraer campos con regex ─────────────────────────────────
         $resultado['numero_proceso']            = self::extraerNumeroProceso($texto);
@@ -282,8 +293,28 @@ class PdfExtractorService
 
         // ── 4. Fallback IA si campos críticos vacíos ────────────────────
         $vacios = array_filter($resultado, fn($v) => empty($v));
-        if (count($vacios) >= 3) {
-            // IaService no tiene extraerCamposTDR — omitir fallback
+        if (count($vacios) >= 3 && !empty($texto) && defined('OPENROUTER_KEY') && OPENROUTER_KEY) {
+            try {
+                $iaResult = IaService::analizarDocumento($texto);
+                $iaDatos  = $iaResult['datos'] ?? [];
+                // Solo rellenar campos vacíos — nunca sobreescribir lo ya extraído
+                $mapeo = [
+                    'monto_total'               => 'monto_total',
+                    'plazo_dias'                => 'plazo_dias',
+                    'forma_pago'                => 'forma_de_pago',
+                    'numero_proceso'            => 'numero_proceso',
+                    'especificaciones_tecnicas' => 'requisitos_tecnicos',
+                ];
+                foreach ($mapeo as $campoLocal => $campoIa) {
+                    if (empty($resultado[$campoLocal]) && !empty($iaDatos[$campoIa])) {
+                        $val = $iaDatos[$campoIa];
+                        if (is_array($val)) $val = implode("\n", $val);
+                        $resultado[$campoLocal] = $val;
+                    }
+                }
+            } catch (\Exception $e) {
+                // IA no disponible — continuar con lo extraído por regex
+            }
         }
 
         return $resultado;
@@ -394,6 +425,122 @@ class PdfExtractorService
         } catch (\Exception $e) {
             return '';
         }
+    }
+
+    /**
+     * Extrae texto con datos posicionales de smalot/pdfparser.
+     * Usa coordenadas X/Y (transformation matrix) para reconstruir filas reales,
+     * detectar columnas y convertir tablas a texto separado por 3 espacios
+     * para que detectarTablaGenerica() pueda procesarlo.
+     */
+    private static function extraerConSmalotPositional(string $ruta): string
+    {
+        try {
+            if (!class_exists('\Smalot\PdfParser\Parser')) return '';
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf    = $parser->parseFile($ruta);
+
+            $textoCompleto = '';
+
+            foreach ($pdf->getPages() as $page) {
+                $dataTm = $page->getDataTm();
+
+                if (empty($dataTm)) {
+                    $textoCompleto .= $page->getText() . "\n\n";
+                    continue;
+                }
+
+                // Recolectar (x, y, text) de cada elemento posicional
+                $elementos = [];
+                foreach ($dataTm as $item) {
+                    // Estructura smalot v2: [$matrix, $font, $size, $spacing, $text]
+                    if (!isset($item[0], $item[4])) continue;
+                    $matrix = $item[0];
+                    if (!is_array($matrix) || count($matrix) < 6) continue;
+                    $x    = (float) $matrix[4];
+                    $y    = (float) $matrix[5];
+                    $text = (string) $item[4];
+                    if (trim($text) === '') continue;
+                    $elementos[] = ['x' => $x, 'y' => $y, 'text' => $text];
+                }
+
+                if (empty($elementos)) {
+                    $textoCompleto .= $page->getText() . "\n\n";
+                    continue;
+                }
+
+                // Agrupar por Y redondeado a decena (cada 10 unidades = misma fila)
+                $filas = [];
+                foreach ($elementos as $el) {
+                    $yKey = (string) (round($el['y'] / 10) * 10);
+                    $filas[$yKey][] = $el;
+                }
+
+                // PDF usa Y desde abajo → ordenar descendente para leer de arriba a abajo
+                krsort($filas, SORT_NUMERIC);
+
+                // Decidir si renderizar como tabla o como texto lineal
+                if (self::detectarTablaDesdeElementos($filas)) {
+                    $textoCompleto .= self::renderizarFilasComoTabla($filas) . "\n\n";
+                } else {
+                    foreach ($filas as $fila) {
+                        usort($fila, fn($a, $b) => $a['x'] <=> $b['x']);
+                        $textoCompleto .= implode(' ', array_column($fila, 'text')) . "\n";
+                    }
+                    $textoCompleto .= "\n";
+                }
+            }
+
+            return $textoCompleto;
+
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Determina si los elementos agrupados por fila forman una tabla.
+     * Criterio: ≥3 filas con ≥2 elementos cuyas posiciones X son consistentes.
+     */
+    private static function detectarTablaDesdeElementos(array $filas): bool
+    {
+        $filasList = array_values($filas);
+        if (count($filasList) < 3) return false;
+
+        $filasConColumnas = array_filter($filasList, fn($f) => count($f) >= 2);
+        if (count($filasConColumnas) < max(2, count($filasList) * 0.4)) return false;
+
+        // Verificar que al menos 2 columnas tienen posiciones X consistentes
+        $xPorColumna = [];
+        foreach (array_slice($filasList, 0, 6) as $fila) {
+            usort($fila, fn($a, $b) => $a['x'] <=> $b['x']);
+            foreach ($fila as $idx => $el) {
+                $xPorColumna[$idx][] = $el['x'];
+            }
+        }
+
+        $columnasBienAlineadas = 0;
+        foreach ($xPorColumna as $xs) {
+            if (count($xs) >= 2 && (max($xs) - min($xs)) < 40) {
+                $columnasBienAlineadas++;
+            }
+        }
+
+        return $columnasBienAlineadas >= 2;
+    }
+
+    /**
+     * Convierte filas posicionales a texto con columnas separadas por 3 espacios,
+     * listo para que detectarTablaGenerica() lo convierta a <table> HTML.
+     */
+    private static function renderizarFilasComoTabla(array $filas): string
+    {
+        $lineas = [];
+        foreach ($filas as $fila) {
+            usort($fila, fn($a, $b) => $a['x'] <=> $b['x']);
+            $lineas[] = implode('   ', array_column($fila, 'text'));
+        }
+        return implode("\n", $lineas);
     }
 
     private static function extraerConPdftotext(string $ruta, bool $layout = true): string
@@ -1246,9 +1393,11 @@ class PdfExtractorService
         };
 
         foreach ($lineas as $linea) {
-            $l     = rtrim($linea);
-            $limpia= trim($l);
-            $largo = mb_strlen($limpia);
+            $l      = rtrim($linea);
+            $limpia = trim($l);
+            $largo  = mb_strlen($limpia);
+            // Detectar nivel de sangría (número de espacios/tabs al inicio)
+            $sangria = mb_strlen($l) - mb_strlen(ltrim($l, " \t"));
 
             // Línea vacía → cerrar párrafo
             if ($largo === 0) {
@@ -1259,7 +1408,7 @@ class PdfExtractorService
             // ─── Sub-encabezado: línea corta TODO MAYÚSCULAS ──────────────
             if ($largo <= 80 && $largo >= 4 &&
                 preg_match('/^(?:\d{1,2}[\.\-\)]\s*)?[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s\.\-\:\/]{3,}$/', $limpia) &&
-                !preg_match('/[a-záéíóúñ]/', $limpia)) // Sin minúsculas
+                !preg_match('/[a-záéíóúñ]/u', $limpia))
             {
                 $flushBuffer();
                 $flushLista();
@@ -1267,7 +1416,23 @@ class PdfExtractorService
                 continue;
             }
 
-            // ─── Bullet: •  ─  -  *  ►  ▶  ◆ ──────────────────────────
+            // ─── Bullet con sangría ≥4 → sub-lista anidada ───────────────
+            if ($sangria >= 4 && preg_match('/^([•\-\*►◆▸▶·]\s+)(.+)/', $limpia, $mb)) {
+                $flushBuffer();
+                if (!$enLista) {
+                    // Abrir lista padre si no hay una
+                    $html .= "<ul>\n";
+                    $enLista   = true;
+                    $tipoLista = 'ul';
+                }
+                // Ítem anidado como <ul> dentro del último <li>
+                $html .= '<li style="list-style-type:circle;margin-left:20px">'
+                       . htmlspecialchars(trim($mb[2]), ENT_QUOTES, 'UTF-8')
+                       . "</li>\n";
+                continue;
+            }
+
+            // ─── Bullet normal: •  ─  -  *  ►  ▶  ◆ ────────────────────
             if (preg_match('/^([•\-\*►◆▸▶·]\s+)(.+)/', $limpia, $mb)) {
                 $flushBuffer();
                 if (!$enLista || $tipoLista !== 'ul') {
@@ -1280,7 +1445,24 @@ class PdfExtractorService
                 continue;
             }
 
-            // ─── Lista ordenada: "1." "a)" "i." al inicio ────────────────
+            // ─── Lista ordenada con sangría ≥4 → sub-lista anidada ───────
+            if ($sangria >= 4 &&
+                preg_match('/^([a-z][\.\)]\s+|[ivxlc]+[\.\)]\s+)(.+)/i', $limpia, $mn) &&
+                mb_strlen($limpia) < 250)
+            {
+                $flushBuffer();
+                if (!$enLista) {
+                    $html .= "<ol>\n";
+                    $enLista   = true;
+                    $tipoLista = 'ol';
+                }
+                $html .= '<li style="list-style-type:lower-alpha;margin-left:20px">'
+                       . htmlspecialchars(trim($mn[2]), ENT_QUOTES, 'UTF-8')
+                       . "</li>\n";
+                continue;
+            }
+
+            // ─── Lista ordenada normal: "1." "a)" "i." al inicio ─────────
             if (preg_match('/^(\d{1,2}[\.\)]\s+|[a-z][\.\)]\s+|[ivxlc]+[\.\)]\s+)(.+)/i', $limpia, $mn)
                 && mb_strlen($limpia) < 250)
             {
@@ -1297,7 +1479,6 @@ class PdfExtractorService
 
             // ─── Texto normal: cerrar listas y acumular párrafo ──────────
             $flushLista();
-            // Si hay sangría y el buffer ya tiene texto, puede ser continuación
             if ($buffer !== '') {
                 $buffer .= ' ' . $limpia;
             } else {
@@ -1305,7 +1486,7 @@ class PdfExtractorService
             }
 
             // Fin de oración → cerrar párrafo
-            if (preg_match('/[\.!\?]\s*$/', $limpia) && mb_strlen($buffer) > 80) {
+            if (preg_match('/[\.!\?]\s*$/u', $limpia) && mb_strlen($buffer) > 80) {
                 $flushBuffer();
             }
         }
@@ -1317,8 +1498,14 @@ class PdfExtractorService
     }
 
     /**
-     * Detecta y convierte tablas genéricas de texto plano (columnas por espacios)
-     * Retorna HTML <table> o null si no parece tabla
+     * Detecta y convierte tablas genéricas de texto plano (columnas por espacios).
+     * Retorna HTML <table> o null si no parece tabla.
+     *
+     * Mejoras v2:
+     *  - Detecta automáticamente la cabecera (primera fila en MAYÚSCULAS)
+     *  - Usa <thead>/<tbody> para accesibilidad
+     *  - Agrega vertical-align:top en celdas de datos
+     *  - Umbral bajado a 55% para capturar más tablas reales de TDR
      */
     private static function detectarTablaGenerica(string $texto): ?string
     {
@@ -1327,8 +1514,8 @@ class PdfExtractorService
 
         if (count($lineas) < 2) return null;
 
-        // Verificar que ≥60% de líneas tienen columnas separadas por 2+ espacios
-        $conColumnas = 0;
+        // Verificar que ≥55% de líneas tienen columnas separadas por 2+ espacios
+        $conColumnas      = 0;
         $columnasPorLinea = [];
         foreach ($lineas as $l) {
             $cols = preg_split('/\s{2,}/', trim($l));
@@ -1338,7 +1525,7 @@ class PdfExtractorService
         }
 
         $pct = count($lineas) > 0 ? $conColumnas / count($lineas) : 0;
-        if ($pct < 0.6) return null;
+        if ($pct < 0.55) return null;
 
         // Número de columnas más frecuente
         $frecuencias = array_count_values($columnasPorLinea);
@@ -1346,25 +1533,41 @@ class PdfExtractorService
         $nCols = key($frecuencias);
         if ($nCols < 2) return null;
 
-        // Construir tabla HTML
-        $html    = '<table style="border-collapse:collapse;width:100%"><tbody>';
-        $primera = true;
-        foreach ($lineas as $l) {
+        // La primera fila es cabecera si está completamente en MAYÚSCULAS
+        $primeraLinea = trim($lineas[0]);
+        $esCabecera   = $primeraLinea !== '' && !preg_match('/[a-záéíóúñ]/u', $primeraLinea);
+
+        $styleTh = ' style="background:#e8e8e8;font-weight:bold;border:1px solid #ccc;padding:4px 8px;text-align:left"';
+        $styleTd = ' style="border:1px solid #ccc;padding:4px 8px;vertical-align:top"';
+
+        // Construir tabla HTML con <thead>/<tbody>
+        $htmlHead = '';
+        $htmlBody = '';
+
+        foreach ($lineas as $idx => $l) {
             $cols = preg_split('/\s{2,}/', trim($l));
-            // Normalizar al número de columnas esperado
             while (count($cols) < $nCols) $cols[] = '';
-            $tag = $primera ? 'th' : 'td';
-            $style = $primera
-                ? ' style="background:#e8e8e8;font-weight:bold;border:1px solid #ccc;padding:4px 8px"'
-                : ' style="border:1px solid #ccc;padding:4px 8px"';
-            $html .= '<tr>';
+
+            $celdasHtml = '';
             foreach (array_slice($cols, 0, $nCols) as $c) {
-                $html .= "<{$tag}{$style}>" . htmlspecialchars(trim($c), ENT_QUOTES, 'UTF-8') . "</{$tag}>";
+                $cEsc = htmlspecialchars(trim($c), ENT_QUOTES, 'UTF-8');
+                if ($idx === 0 && $esCabecera) {
+                    $celdasHtml .= "<th{$styleTh}>{$cEsc}</th>";
+                } else {
+                    $celdasHtml .= "<td{$styleTd}>{$cEsc}</td>";
+                }
             }
-            $html .= '</tr>';
-            $primera = false;
+
+            if ($idx === 0 && $esCabecera) {
+                $htmlHead .= "<thead><tr>{$celdasHtml}</tr></thead>";
+            } else {
+                $htmlBody .= "<tr>{$celdasHtml}</tr>";
+            }
         }
-        $html .= '</tbody></table>';
-        return $html;
+
+        return '<table style="border-collapse:collapse;width:100%">'
+             . $htmlHead
+             . "<tbody>{$htmlBody}</tbody>"
+             . '</table>';
     }
 }
