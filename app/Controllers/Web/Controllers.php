@@ -592,6 +592,13 @@ class ProcesosController extends BaseController
             if (isset($_POST[$f])) $update[$f] = $_POST[$f] === '' ? null : $_POST[$f];
         }
 
+        // Títulos personalizables de secciones (JSON)
+        if (!empty($_POST['secciones_titulos']) && is_array($_POST['secciones_titulos'])) {
+            $titulos = array_map('trim', $_POST['secciones_titulos']);
+            $titulos = array_filter($titulos, fn($v) => $v !== '');
+            $update['secciones_titulos'] = !empty($titulos) ? json_encode($titulos, JSON_UNESCAPED_UNICODE) : null;
+        }
+
         // Toggles on/off: el checkbox envía "1" si activo, sino viene el hidden "0"
         $update['nota_espec_activa']  = ($_POST['nota_espec_activa']  ?? $_POST['nota_espec_activa_off']  ?? '1') === '1' ? '1' : '0';
         $update['declaracion_activa'] = ($_POST['declaracion_activa'] ?? $_POST['declaracion_activa_off'] ?? '1') === '1' ? '1' : '0';
@@ -738,6 +745,13 @@ class ProcesosController extends BaseController
             'ad_antecedentes','ad_verificacion','ad_liquidacion','ad_conformidad',
             // Secciones Solicitud de Pago
             'sp_antecedentes','sp_justificacion','sp_documentos','sp_solicitud',
+            // Títulos personalizables de secciones
+            'titulo_it_antecedentes','titulo_it_objetivo','titulo_it_desarrollo',
+            'titulo_it_conclusiones','titulo_it_recomendaciones',
+            'titulo_gt_objeto','titulo_gt_vigencia','titulo_gt_cobertura',
+            'titulo_ap_antecedentes','titulo_ap_detalle','titulo_ap_pendientes','titulo_ap_conformidad',
+            'titulo_ad_antecedentes','titulo_ad_verificacion','titulo_ad_liquidacion','titulo_ad_conformidad',
+            'titulo_sp_antecedentes','titulo_sp_justificacion','titulo_sp_documentos','titulo_sp_solicitud',
         ];
         foreach ($override as $campo) {
             if (isset($_POST[$campo]) && $_POST[$campo] !== '') {

@@ -288,9 +288,10 @@ if ($tipo === 'informe_tecnico') {
       <?= csrf_field() ?>
       <input type="hidden" name="tipo" value="<?= e($tipo) ?>">
 
-      <!-- Hidden inputs para secciones fijas -->
+      <!-- Hidden inputs para secciones fijas (contenido + título personalizable) -->
 <?php foreach ($secciones as $sec): ?>
       <input type="hidden" name="<?= e($sec['key']) ?>" id="h_<?= e($sec['key']) ?>">
+      <input type="hidden" name="titulo_<?= e($sec['key']) ?>" id="h_titulo_<?= e($sec['key']) ?>">
 <?php endforeach; ?>
 <?php if ($admiteSeccionesExtra): ?>
       <!-- Hidden input para secciones personalizadas (JSON) -->
@@ -355,9 +356,15 @@ if ($tipo === 'informe_tecnico') {
 <?php foreach ($secciones as $sec): ?>
           <div class="col-12">
             <div class="seccion-editor">
-              <label class="form-label fw-semibold small mb-1">
-                <i class="bi <?= e($sec['icono']) ?> me-1 text-primary"></i><?= e($sec['label']) ?>
-              </label>
+              <div class="d-flex align-items-center gap-1 mb-1">
+                <i class="bi <?= e($sec['icono']) ?> text-primary flex-shrink-0" style="font-size:.85rem"></i>
+                <input type="text"
+                       id="titulo_visible_<?= e($sec['key']) ?>"
+                       class="form-control form-control-sm fw-semibold border-0 border-bottom rounded-0 px-1 bg-transparent"
+                       value="<?= e($sec['label']) ?>"
+                       title="Haz clic para editar el título de esta sección"
+                       style="font-size:.8rem;max-width:420px;box-shadow:none;">
+              </div>
               <?php if ($sec['ayuda']): ?>
               <div class="seccion-ayuda"><?= e($sec['ayuda']) ?></div>
               <?php endif; ?>
@@ -519,10 +526,12 @@ function quitarSeccion(idx) {
 
 // ── Sincronizar todo antes de enviar ─────────────────────────────────────
 document.getElementById('formDocumento').addEventListener('submit', function() {
-  // Secciones fijas
+  // Secciones fijas: contenido + título personalizable
   <?php foreach ($secciones as $sec): ?>
   document.getElementById('h_<?= $sec['key'] ?>').value =
     editores['<?= $sec['key'] ?>'] ? editores['<?= $sec['key'] ?>'].getData() : '';
+  document.getElementById('h_titulo_<?= $sec['key'] ?>').value =
+    (document.getElementById('titulo_visible_<?= $sec['key'] ?>')?.value ?? '').trim() || '<?= addslashes($sec['label']) ?>';
   <?php endforeach; ?>
 
 <?php if ($admiteSeccionesExtra): ?>

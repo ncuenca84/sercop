@@ -371,9 +371,26 @@
           </div>
           <?php endif; ?>
 
+          <?php
+          // ── Títulos personalizables de secciones de Fase 2 ────────────────
+          $titulosSecciones = json_decode($proceso['secciones_titulos'] ?? '{}', true) ?: [];
+          function tituloSeccion(array &$ts, string $key, string $default): string {
+              $val = htmlspecialchars($ts[$key] ?? $default, ENT_QUOTES);
+              return '<span class="d-inline-flex align-items-center gap-1">'
+                   . '<span class="titulo-seccion-texto" data-key="' . $key . '">' . $val . '</span>'
+                   . '<button type="button" class="btn btn-xs btn-link p-0 ms-1 text-muted titulo-seccion-edit" '
+                   .         'data-key="' . $key . '" title="Editar título">'
+                   .   '<i class="bi bi-pencil" style="font-size:.7rem"></i>'
+                   . '</button>'
+                   . '<input type="hidden" name="secciones_titulos[' . $key . ']" '
+                   .        'class="titulo-seccion-hidden" data-key="' . $key . '" value="' . $val . '">'
+                   . '</span>';
+          }
+          ?>
           <!-- 1. ESPECIFICACIONES TÉCNICAS / PRODUCTOS O SERVICIOS ESPERADOS -->
           <div class="col-12">
-            <label class="form-label fw-semibold small">Especificaciones Técnicas / Productos o Servicios Esperados
+            <label class="form-label fw-semibold small">
+              <?= tituloSeccion($titulosSecciones, 'especificaciones_tecnicas', 'Especificaciones Técnicas / Productos o Servicios Esperados') ?>
               <?php if(!empty($proceso['especificaciones_tecnicas'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="especificaciones_tecnicas" id="ck_especificaciones" class="form-control form-control-sm"
@@ -425,7 +442,8 @@
 
           <!-- 2. METODOLOGÍA DE TRABAJO -->
           <div class="col-12">
-            <label class="form-label fw-semibold small">Metodología de Trabajo
+            <label class="form-label fw-semibold small">
+              <?= tituloSeccion($titulosSecciones, 'metodologia_trabajo', 'Metodología de Trabajo') ?>
               <?php if(!empty($proceso['metodologia_trabajo'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="metodologia_trabajo" id="ck_metodologia" class="form-control form-control-sm"
@@ -434,7 +452,8 @@
 
           <!-- 3. CPC -->
           <div class="col-12">
-            <label class="form-label fw-semibold small">CPC — Código y Descripción
+            <label class="form-label fw-semibold small">
+              <?= tituloSeccion($titulosSecciones, 'cpc_descripcion', 'CPC — Código y Descripción') ?>
               <?php if(!empty($proceso['cpc_descripcion'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="cpc_descripcion" id="cpc_descripcion" rows="3" class="form-control form-control-sm"
@@ -443,7 +462,8 @@
 
           <!-- 4. PLAZO DE ENTREGA (texto completo) -->
           <div class="col-12">
-            <label class="form-label fw-semibold small">Plazo de Entrega — texto completo
+            <label class="form-label fw-semibold small">
+              <?= tituloSeccion($titulosSecciones, 'plazo_texto', 'Plazo de Entrega — texto completo') ?>
               <?php if(!empty($proceso['plazo_texto'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="plazo_texto" id="plazo_texto" rows="2" class="form-control form-control-sm"
@@ -452,7 +472,8 @@
 
           <!-- 5. FORMA Y CONDICIONES DE PAGO -->
           <div class="col-12">
-            <label class="form-label fw-semibold small">Forma y Condiciones de Pago
+            <label class="form-label fw-semibold small">
+              <?= tituloSeccion($titulosSecciones, 'forma_pago', 'Forma y Condiciones de Pago') ?>
               <?php if(!empty($proceso['forma_pago'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="forma_pago" id="ck_forma_pago" class="form-control form-control-sm"
@@ -1219,6 +1240,41 @@ function escHtml(str) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── Títulos personalizables de secciones Fase 2 ──────────────────────────
+document.querySelectorAll('.titulo-seccion-edit').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    const key    = this.dataset.key;
+    const span   = document.querySelector('.titulo-seccion-texto[data-key="' + key + '"]');
+    const hidden = document.querySelector('.titulo-seccion-hidden[data-key="' + key + '"]');
+    const current = span.textContent;
+    const input = document.createElement('input');
+    input.type  = 'text';
+    input.value = current;
+    input.className = 'form-control form-control-sm d-inline-block fw-semibold';
+    input.style.maxWidth = '380px';
+    input.style.fontSize = '.8rem';
+    span.replaceWith(input);
+    this.innerHTML = '<i class="bi bi-check-lg" style="font-size:.7rem"></i>';
+    this.title = 'Guardar título';
+    input.focus();
+    const guardar = () => {
+      const val = input.value.trim() || current;
+      const newSpan = document.createElement('span');
+      newSpan.className = 'titulo-seccion-texto';
+      newSpan.dataset.key = key;
+      newSpan.textContent = val;
+      input.replaceWith(newSpan);
+      hidden.value = val;
+      btn.innerHTML = '<i class="bi bi-pencil" style="font-size:.7rem"></i>';
+      btn.title = 'Editar título';
+    };
+    this.addEventListener('click', guardar, { once: true });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); guardar(); }
+    });
+  });
+});
 
 function nombreCampoLabel(campo) {
   return {

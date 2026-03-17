@@ -179,6 +179,9 @@ class ProformaService
                     ? $proceso['vigencia_oferta']
                     : ($config['vigencia_oferta'] ?? '30 días calendario')
             ),
+            // Títulos personalizables de secciones inline en el template
+            '{{titulo.plazo_texto}}'     => self::tituloSec($proceso, 'plazo_texto',     '5. Plazo de Entrega'),
+            '{{titulo.vigencia_oferta}}' => self::tituloSec($proceso, 'vigencia_oferta', '7. Vigencia de la Oferta'),
             // URL back (inyectado por el controller, no reemplazar aquí)
         ];
     }
@@ -243,6 +246,17 @@ class ProformaService
         </tr>";
     }
 
+    // ── Título personalizable de sección ─────────────────────────────────
+    private static function tituloSec(array $proceso, string $key, string $default): string
+    {
+        static $cache = [];
+        $pid = $proceso['id'] ?? 0;
+        if (!isset($cache[$pid])) {
+            $cache[$pid] = json_decode($proceso['secciones_titulos'] ?? '{}', true) ?: [];
+        }
+        return htmlspecialchars($cache[$pid][$key] ?? $default);
+    }
+
     // ── Sección HTML Especificaciones Técnicas ────────────────────────────
     private static function seccionEspecificaciones(array $proceso): string
     {
@@ -262,7 +276,7 @@ class ProformaService
         }
 
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">2. Especificaciones T&eacute;cnicas</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'especificaciones_tecnicas', '2. Especificaciones Técnicas') . '</div>
             <div class="ck-content" style="font-size:9pt;line-height:1.5">'
             . $contenido
             . $notaBloque
@@ -276,7 +290,7 @@ class ProformaService
         if (empty($texto)) return '';
         $contenido = self::sanitizarHtmlEditor($texto);
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">3. Metodolog&iacute;a de Trabajo</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'metodologia_trabajo', '3. Metodología de Trabajo') . '</div>
             <div class="ck-content" style="font-size:9pt;line-height:1.5">'
             . $contenido .
             '</div></div>';
@@ -309,7 +323,7 @@ class ProformaService
         $texto = trim($proceso['cpc_descripcion'] ?? '');
         if (empty($texto)) return '';
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">4. CPC</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'cpc_descripcion', '4. CPC') . '</div>
             <div style="font-size:9.5pt;line-height:1.5;white-space:pre-wrap">'
             . htmlspecialchars($texto) .
             '</div></div>';
@@ -322,7 +336,7 @@ class ProformaService
         if (empty($texto)) return '';
         $contenido = self::sanitizarHtmlEditor($texto);
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">6. Forma y Condiciones de Pago</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'forma_pago', '6. Forma y Condiciones de Pago') . '</div>
             <div class="ck-content" style="font-size:9.5pt;line-height:1.5">'
             . $contenido .
             '</div></div>';
@@ -512,7 +526,7 @@ class ProformaService
   {{proceso.cpc}}
 
   <!-- 5. PLAZO DE ENTREGA -->
-  <div style="margin-bottom:12px"><div class="sec-tit">5. Plazo de Entrega</div>
+  <div style="margin-bottom:12px"><div class="sec-tit">{{titulo.plazo_texto}}</div>
     <div style="font-size:9.5pt">{{proceso.plazo_texto}}</div>
   </div>
 
@@ -520,7 +534,7 @@ class ProformaService
   {{proceso.forma_pago}}
 
   <!-- 7. VIGENCIA DE LA OFERTA -->
-  <div style="margin-bottom:12px"><div class="sec-tit">7. Vigencia de la Oferta</div>
+  <div style="margin-bottom:12px"><div class="sec-tit">{{titulo.vigencia_oferta}}</div>
     <div style="font-size:9.5pt">{{proceso.vigencia_oferta}}</div>
   </div>
 

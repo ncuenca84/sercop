@@ -122,6 +122,31 @@ class DocumentoService
             '{{sp.justificacion}}'       => self::htmlSeguro($proceso['sp_justificacion']?? ''),
             '{{sp.documentos}}'          => self::htmlSeguro($proceso['sp_documentos']   ?? ''),
             '{{sp.solicitud}}'           => self::htmlSeguro($proceso['sp_solicitud']    ?? ''),
+            // Títulos personalizables de secciones (Informe Técnico)
+            '{{titulo.it_antecedentes}}'   => htmlspecialchars($proceso['titulo_it_antecedentes']   ?? '1. Antecedentes'),
+            '{{titulo.it_objetivo}}'       => htmlspecialchars($proceso['titulo_it_objetivo']       ?? '2. Objetivo'),
+            '{{titulo.it_desarrollo}}'     => htmlspecialchars($proceso['titulo_it_desarrollo']     ?? '3. Desarrollo'),
+            '{{titulo.it_conclusiones}}'   => htmlspecialchars($proceso['titulo_it_conclusiones']   ?? '4. Conclusiones'),
+            '{{titulo.it_recomendaciones}}'=> htmlspecialchars($proceso['titulo_it_recomendaciones']?? '5. Recomendaciones'),
+            // Títulos personalizables (Garantía Técnica)
+            '{{titulo.gt_objeto}}'         => htmlspecialchars($proceso['titulo_gt_objeto']         ?? '1. Objeto de la Garantía'),
+            '{{titulo.gt_vigencia}}'       => htmlspecialchars($proceso['titulo_gt_vigencia']       ?? '2. Vigencia'),
+            '{{titulo.gt_cobertura}}'      => htmlspecialchars($proceso['titulo_gt_cobertura']      ?? '3. Cobertura del Soporte'),
+            // Títulos personalizables (Acta Parcial)
+            '{{titulo.ap_antecedentes}}'   => htmlspecialchars($proceso['titulo_ap_antecedentes']   ?? '1. Antecedentes'),
+            '{{titulo.ap_detalle}}'        => htmlspecialchars($proceso['titulo_ap_detalle']        ?? '2. Detalle de lo Entregado'),
+            '{{titulo.ap_pendientes}}'     => htmlspecialchars($proceso['titulo_ap_pendientes']     ?? '3. Pendientes'),
+            '{{titulo.ap_conformidad}}'    => htmlspecialchars($proceso['titulo_ap_conformidad']    ?? '4. Conformidad Parcial'),
+            // Títulos personalizables (Acta Definitiva)
+            '{{titulo.ad_antecedentes}}'   => htmlspecialchars($proceso['titulo_ad_antecedentes']   ?? '1. Antecedentes'),
+            '{{titulo.ad_verificacion}}'   => htmlspecialchars($proceso['titulo_ad_verificacion']   ?? '2. Verificación de Entregables'),
+            '{{titulo.ad_liquidacion}}'    => htmlspecialchars($proceso['titulo_ad_liquidacion']    ?? '3. Liquidación de Pendientes'),
+            '{{titulo.ad_conformidad}}'    => htmlspecialchars($proceso['titulo_ad_conformidad']    ?? '4. Conformidad Definitiva'),
+            // Títulos personalizables (Solicitud de Pago)
+            '{{titulo.sp_antecedentes}}'   => htmlspecialchars($proceso['titulo_sp_antecedentes']   ?? '1. Antecedentes'),
+            '{{titulo.sp_justificacion}}'  => htmlspecialchars($proceso['titulo_sp_justificacion']  ?? '2. Justificación del Pago'),
+            '{{titulo.sp_documentos}}'     => htmlspecialchars($proceso['titulo_sp_documentos']     ?? '3. Documentos Adjuntos'),
+            '{{titulo.sp_solicitud}}'      => htmlspecialchars($proceso['titulo_sp_solicitud']      ?? '4. Petición Formal'),
             // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
@@ -312,17 +337,17 @@ class DocumentoService
             </table></div>
 
             <div class="seccion">
-                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-titulo">{{titulo.it_antecedentes}}</div>
                 <div class="seccion-body">{{it.antecedentes}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">2. Objetivo</div>
+                <div class="seccion-titulo">{{titulo.it_objetivo}}</div>
                 <div class="seccion-body">{{it.objetivo}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">3. Desarrollo</div>
+                <div class="seccion-titulo">{{titulo.it_desarrollo}}</div>
                 <div class="seccion-body">{{it.desarrollo}}</div>
             </div>
 
@@ -332,12 +357,12 @@ class DocumentoService
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">4. Conclusiones</div>
+                <div class="seccion-titulo">{{titulo.it_conclusiones}}</div>
                 <div class="seccion-body">{{it.conclusiones}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">5. Recomendaciones</div>
+                <div class="seccion-titulo">{{titulo.it_recomendaciones}}</div>
                 <div class="seccion-body">{{it.recomendaciones}}</div>
             </div>
 
@@ -390,12 +415,12 @@ class DocumentoService
             </table></div>
 
             <div class="seccion">
-                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-titulo">{{titulo.ap_antecedentes}}</div>
                 <div class="seccion-body">{{ap.antecedentes}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">2. Detalle de lo Entregado</div>
+                <div class="seccion-titulo">{{titulo.ap_detalle}}</div>
                 <div class="seccion-body">{{ap.detalle}}</div>
             </div>
 
@@ -405,12 +430,12 @@ class DocumentoService
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">3. Pendientes</div>
+                <div class="seccion-titulo">{{titulo.ap_pendientes}}</div>
                 <div class="seccion-body">{{ap.pendientes}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">4. Conformidad</div>
+                <div class="seccion-titulo">{{titulo.ap_conformidad}}</div>
                 <div class="seccion-body">{{ap.conformidad}}</div>
             </div>
 
@@ -472,12 +497,12 @@ class DocumentoService
             </table></div>
 
             <div class="seccion">
-                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-titulo">{{titulo.ad_antecedentes}}</div>
                 <div class="seccion-body">{{ad.antecedentes}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">2. Verificación de Entregables</div>
+                <div class="seccion-titulo">{{titulo.ad_verificacion}}</div>
                 <div class="seccion-body">{{ad.verificacion}}</div>
             </div>
 
@@ -487,12 +512,12 @@ class DocumentoService
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">3. Liquidación de Pendientes</div>
+                <div class="seccion-titulo">{{titulo.ad_liquidacion}}</div>
                 <div class="seccion-body">{{ad.liquidacion}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">4. Conformidad Definitiva</div>
+                <div class="seccion-titulo">{{titulo.ad_conformidad}}</div>
                 <div class="seccion-body">{{ad.conformidad}}</div>
             </div>
 
@@ -619,17 +644,17 @@ class DocumentoService
             </table></div>
 
             <div class="seccion">
-                <div class="seccion-titulo">1. Objeto de la Garantía</div>
+                <div class="seccion-titulo">{{titulo.gt_objeto}}</div>
                 <div class="seccion-body">{{gt.objeto}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">2. Vigencia</div>
+                <div class="seccion-titulo">{{titulo.gt_vigencia}}</div>
                 <div class="seccion-body">{{gt.vigencia}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">3. Cobertura del Soporte</div>
+                <div class="seccion-titulo">{{titulo.gt_cobertura}}</div>
                 <div class="seccion-body">{{gt.cobertura}}</div>
             </div>
 
@@ -675,12 +700,12 @@ class DocumentoService
             </table></div>
 
             <div class="seccion">
-                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-titulo">{{titulo.sp_antecedentes}}</div>
                 <div class="seccion-body">{{sp.antecedentes}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">2. Justificación del Pago</div>
+                <div class="seccion-titulo">{{titulo.sp_justificacion}}</div>
                 <div class="seccion-body">{{sp.justificacion}}</div>
             </div>
 
@@ -709,12 +734,12 @@ class DocumentoService
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">3. Documentos Adjuntos</div>
+                <div class="seccion-titulo">{{titulo.sp_documentos}}</div>
                 <div class="seccion-body">{{sp.documentos}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">4. Petición Formal</div>
+                <div class="seccion-titulo">{{titulo.sp_solicitud}}</div>
                 <div class="seccion-body">{{sp.solicitud}}</div>
             </div>
 
