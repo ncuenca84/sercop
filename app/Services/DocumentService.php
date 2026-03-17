@@ -97,6 +97,12 @@ class DocumentoService
             '{{proveedor.email}}'         => htmlspecialchars($_SESSION['tenant_email'] ?? ''),
             // Entregables
             '{{entregables_tabla}}'       => $entregablesHtml,
+            // Secciones Informe Técnico (editadas manualmente en el editor)
+            '{{it.antecedentes}}'        => self::htmlSeguro($proceso['it_antecedentes']    ?? ''),
+            '{{it.objetivo}}'            => self::htmlSeguro($proceso['it_objetivo']        ?? ''),
+            '{{it.desarrollo}}'          => self::htmlSeguro($proceso['it_desarrollo']      ?? ''),
+            '{{it.conclusiones}}'        => self::htmlSeguro($proceso['it_conclusiones']    ?? ''),
+            '{{it.recomendaciones}}'     => self::htmlSeguro($proceso['it_recomendaciones'] ?? ''),
             // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
@@ -267,40 +273,32 @@ class DocumentoService
 
             <div class="seccion">
                 <div class="seccion-titulo">1. Antecedentes</div>
-                <div class="seccion-body">
-                    En cumplimiento del proceso de contratación <strong>{{proceso.numero}}</strong>, cuyo objeto es
-                    <strong>{{proceso.objeto}}</strong>, la empresa <strong>{{proveedor.razon_social}}</strong>
-                    presenta el presente informe técnico de entrega de los bienes/servicios contratados.
-                </div>
+                <div class="seccion-body">{{it.antecedentes}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">2. Especificaciones Técnicas Entregadas</div>
-                <div class="seccion-body">{{proceso.especificaciones}}</div>
+                <div class="seccion-titulo">2. Objetivo</div>
+                <div class="seccion-body">{{it.objetivo}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">3. Metodología y Proceso de Entrega</div>
-                <div class="seccion-body">{{proceso.metodologia}}</div>
+                <div class="seccion-titulo">3. Desarrollo</div>
+                <div class="seccion-body">{{it.desarrollo}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">4. Entregables</div>
+                <div class="seccion-titulo">Entregables</div>
                 {{entregables_tabla}}
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">5. Observaciones</div>
-                <div class="seccion-body">{{doc.observaciones}}</div>
+                <div class="seccion-titulo">4. Conclusiones</div>
+                <div class="seccion-body">{{it.conclusiones}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">6. Conclusión</div>
-                <div class="seccion-body">
-                    Los bienes/servicios han sido entregados en su totalidad conforme a las especificaciones
-                    técnicas acordadas, en el plazo establecido de {{proceso.plazo}}, a entera satisfacción
-                    de la institución contratante.
-                </div>
+                <div class="seccion-titulo">5. Recomendaciones</div>
+                <div class="seccion-body">{{it.recomendaciones}}</div>
             </div>
 
             <div class="firma-section">

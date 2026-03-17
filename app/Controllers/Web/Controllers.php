@@ -728,6 +728,8 @@ class ProcesosController extends BaseController
             'fecha_inicio','fecha_fin','vigencia_oferta','forma_pago',
             'especificaciones_tecnicas','metodologia_trabajo','declaracion_cumplimiento',
             'cpc','cpc_descripcion','plazo_texto',
+            // Secciones Informe Técnico
+            'it_antecedentes','it_objetivo','it_desarrollo','it_conclusiones','it_recomendaciones',
         ];
         foreach ($override as $campo) {
             if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
