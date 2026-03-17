@@ -217,11 +217,13 @@ if ($tipo === 'informe_tecnico') {
         . "completados todos los elementos pendientes indicados en la sección anterior.</p>";
 
 } elseif ($tipo === 'solicitud_pago') {
+    $adminNombre = $proceso['administrador_nombre'] ?? 'Administrador del Contrato';
+    $adminCargo  = $proceso['administrador_cargo']  ?? 'Administrador del Contrato';
     $sugerencias['sp_antecedentes'] =
         "<p>Por medio de la presente, yo, <strong>{$rep}</strong>, Representante Legal de "
         . "<strong>{$prov}</strong>, RUC <strong>{$ruc}</strong>, me dirijo a usted, "
-        . "<strong>{$proceso['administrador_nombre'] ?? 'Administrador del Contrato'}</strong>, "
-        . "en su calidad de <strong>{$proceso['administrador_cargo'] ?? 'Administrador del Contrato'}</strong> "
+        . "<strong>{$adminNombre}</strong>, "
+        . "en su calidad de <strong>{$adminCargo}</strong> "
         . "de <strong>{$inst}</strong>, con el fin de presentar la solicitud de pago correspondiente "
         . "al proceso de contratación <strong>{$numero}</strong>, cuyo objeto es: "
         . "<strong>{$objeto}</strong>, por un monto contractual de <strong>\${$monto}</strong> más IVA.</p>";
