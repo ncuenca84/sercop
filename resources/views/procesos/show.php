@@ -24,7 +24,6 @@
           'acta_parcial'       => ['&#x1F4CB;','Acta de Entrega Parcial'],
           'acta_definitiva'    => ['&#x2705;','Acta Entrega Definitiva'],
           'solicitud_pago'     => ['&#x1F4B0;','Solicitud de Pago'],
-          'informe_conformidad'=> ['&#x2714;','Informe de Conformidad'],
         ] as $tipo => [$icono,$label]): ?>
         <li>
           <a class="dropdown-item d-flex align-items-center gap-2"

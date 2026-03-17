@@ -19,7 +19,6 @@ class DocumentoService
             case 'acta_parcial':       return self::renderizar(self::tplActaParcial(),     $vars, $proceso);
             case 'acta_definitiva':    return self::renderizar(self::tplActaDefinitiva(),  $vars, $proceso);
             case 'solicitud_pago':     return self::renderizar(self::tplSolicitudPago(),   $vars, $proceso);
-            case 'informe_conformidad':return self::renderizar(self::tplInformeConformidad(),$vars, $proceso);
             default:                   return self::renderizar(self::tplInformeTecnico(),  $vars, $proceso);
         }
     }
@@ -109,15 +108,20 @@ class DocumentoService
             '{{gt.vigencia}}'            => self::htmlSeguro($proceso['gt_vigencia']  ?? ''),
             '{{gt.cobertura}}'           => self::htmlSeguro($proceso['gt_cobertura'] ?? ''),
             // Secciones Acta de Entrega Parcial
-            '{{ap.objeto}}'              => self::htmlSeguro($proceso['ap_objeto']      ?? ''),
-            '{{ap.detalle}}'             => self::htmlSeguro($proceso['ap_detalle']     ?? ''),
-            '{{ap.pendientes}}'          => self::htmlSeguro($proceso['ap_pendientes']  ?? ''),
-            '{{ap.conformidad}}'         => self::htmlSeguro($proceso['ap_conformidad'] ?? ''),
+            '{{ap.antecedentes}}'        => self::htmlSeguro($proceso['ap_antecedentes'] ?? ''),
+            '{{ap.detalle}}'             => self::htmlSeguro($proceso['ap_detalle']      ?? ''),
+            '{{ap.pendientes}}'          => self::htmlSeguro($proceso['ap_pendientes']   ?? ''),
+            '{{ap.conformidad}}'         => self::htmlSeguro($proceso['ap_conformidad']  ?? ''),
             // Secciones Acta de Entrega Definitiva
             '{{ad.antecedentes}}'        => self::htmlSeguro($proceso['ad_antecedentes'] ?? ''),
             '{{ad.verificacion}}'        => self::htmlSeguro($proceso['ad_verificacion'] ?? ''),
             '{{ad.liquidacion}}'         => self::htmlSeguro($proceso['ad_liquidacion']  ?? ''),
             '{{ad.conformidad}}'         => self::htmlSeguro($proceso['ad_conformidad']  ?? ''),
+            // Secciones Solicitud de Pago
+            '{{sp.antecedentes}}'        => self::htmlSeguro($proceso['sp_antecedentes'] ?? ''),
+            '{{sp.justificacion}}'       => self::htmlSeguro($proceso['sp_justificacion']?? ''),
+            '{{sp.documentos}}'          => self::htmlSeguro($proceso['sp_documentos']   ?? ''),
+            '{{sp.solicitud}}'           => self::htmlSeguro($proceso['sp_solicitud']    ?? ''),
             // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
@@ -386,8 +390,8 @@ class DocumentoService
             </table></div>
 
             <div class="seccion">
-                <div class="seccion-titulo">1. Objeto</div>
-                <div class="seccion-body">{{ap.objeto}}</div>
+                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-body">{{ap.antecedentes}}</div>
             </div>
 
             <div class="seccion">
@@ -654,43 +658,42 @@ class DocumentoService
                 </div>
             </div>
 
+            <div class="doc-meta"><table>
+                <tr><td>Proceso:</td><td>{{proceso.numero}}</td></tr>
+                <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
+                <tr><td>Contratante:</td><td>{{institucion.nombre}}</td></tr>
+                <tr><td>Administrador:</td><td>{{institucion.administrador}} — {{institucion.cargo_admin}}</td></tr>
+                <tr><td>Proveedor:</td><td>{{proveedor.razon_social}} — RUC: {{proveedor.ruc}}</td></tr>
+                <tr><td>Representante:</td><td>{{proveedor.representante}}</td></tr>
+                <tr><td>Monto:</td><td>{{proceso.monto}} + IVA 15% = <strong>{{proceso.total_iva}}</strong></td></tr>
+            </table></div>
+
             <div class="seccion">
-                <div class="seccion-body">
-                    <strong>{{doc.lugar}}, {{doc.fecha}}</strong><br><br>
-                    Señor(a)<br>
-                    <strong>{{institucion.administrador}}</strong><br>
-                    {{institucion.cargo_admin}}<br>
-                    <strong>{{institucion.nombre}}</strong><br>
-                    Presente.–<br><br>
+                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-body">{{sp.antecedentes}}</div>
+            </div>
 
-                    De mi consideración:<br><br>
-
-                    Yo, <strong>{{proveedor.representante}}</strong>, Representante Legal de
-                    <strong>{{proveedor.razon_social}}</strong>, RUC <strong>{{proveedor.ruc}}</strong>,
-                    me permito presentar la solicitud de pago correspondiente al proceso de contratación
-                    <strong>{{proceso.numero}}</strong>.
-                </div>
+            <div class="seccion">
+                <div class="seccion-titulo">2. Justificación del Pago</div>
+                <div class="seccion-body">{{sp.justificacion}}</div>
             </div>
 
             <div class="seccion">
                 <div class="seccion-titulo">Detalle del Valor a Cobrar</div>
-                <table style="width:100%;border-collapse:collapse;font-size:11pt;margin-top:8px">
-                    <tr style="background:#f0f0f0">
-                        <td style="border:1px solid #ccc;padding:6px 10px;font-weight:bold">Concepto</td>
-                        <td style="border:1px solid #ccc;padding:6px 10px;font-weight:bold;text-align:right">Valor</td>
-                    </tr>
-                    <tr>
-                        <td style="border:1px solid #ccc;padding:6px 10px">{{proceso.objeto}}</td>
-                        <td style="border:1px solid #ccc;padding:6px 10px;text-align:right">{{proceso.monto}}</td>
-                    </tr>
-                    <tr>
-                        <td style="border:1px solid #ccc;padding:6px 10px">IVA 15%</td>
-                        <td style="border:1px solid #ccc;padding:6px 10px;text-align:right">{{proceso.iva}}</td>
-                    </tr>
+                <table style="width:100%;border-collapse:collapse;font-size:10pt;margin-top:8px">
+                    <thead><tr>
+                        <th style="border:1px solid #ccc;padding:6px 10px;text-align:left">Concepto</th>
+                        <th style="border:1px solid #ccc;padding:6px 10px;text-align:right;width:22%">Valor</th>
+                    </tr></thead>
+                    <tbody>
+                    <tr><td style="border:1px solid #ccc;padding:6px 10px">{{proceso.objeto}}</td>
+                        <td style="border:1px solid #ccc;padding:6px 10px;text-align:right">{{proceso.monto}}</td></tr>
+                    <tr><td style="border:1px solid #ccc;padding:6px 10px">IVA 15%</td>
+                        <td style="border:1px solid #ccc;padding:6px 10px;text-align:right">{{proceso.iva}}</td></tr>
                     <tr style="font-weight:bold">
-                        <td style="border:1px solid #ccc;padding:6px 10px">TOTAL</td>
-                        <td style="border:1px solid #ccc;padding:6px 10px;text-align:right">{{proceso.total_iva}}</td>
-                    </tr>
+                        <td style="border:1px solid #ccc;padding:6px 10px">TOTAL A COBRAR</td>
+                        <td style="border:1px solid #ccc;padding:6px 10px;text-align:right">{{proceso.total_iva}}</td></tr>
+                    </tbody>
                 </table>
             </div>
 
@@ -700,16 +703,13 @@ class DocumentoService
             </div>
 
             <div class="seccion">
-                <div class="seccion-titulo">Observaciones</div>
-                <div class="seccion-body">{{doc.observaciones}}</div>
+                <div class="seccion-titulo">3. Documentos Adjuntos</div>
+                <div class="seccion-body">{{sp.documentos}}</div>
             </div>
 
             <div class="seccion">
-                <div class="seccion-body">
-                    En virtud de haber cumplido con todos los requisitos establecidos en el proceso de contratación,
-                    solicito se proceda con el pago correspondiente a la brevedad posible.<br><br>
-                    Atentamente,
-                </div>
+                <div class="seccion-titulo">4. Petición Formal</div>
+                <div class="seccion-body">{{sp.solicitud}}</div>
             </div>
 
             <div class="firma-section">

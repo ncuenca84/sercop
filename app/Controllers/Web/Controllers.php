@@ -704,7 +704,6 @@ class ProcesosController extends BaseController
             'acta_parcial'       => 'Acta de Entrega Parcial',
             'acta_definitiva'    => 'Acta de Entrega Definitiva',
             'solicitud_pago'     => 'Solicitud de Pago',
-            'informe_conformidad'=> 'Informe de Conformidad',
         ];
         $titulo = $titulos[$tipo] ?? ucfirst(str_replace('_',' ',$tipo));
 
@@ -734,9 +733,11 @@ class ProcesosController extends BaseController
             // Secciones Garantía Técnica
             'gt_objeto','gt_vigencia','gt_cobertura',
             // Secciones Acta de Entrega Parcial
-            'ap_objeto','ap_detalle','ap_pendientes','ap_conformidad',
+            'ap_antecedentes','ap_detalle','ap_pendientes','ap_conformidad',
             // Secciones Acta de Entrega Definitiva
             'ad_antecedentes','ad_verificacion','ad_liquidacion','ad_conformidad',
+            // Secciones Solicitud de Pago
+            'sp_antecedentes','sp_justificacion','sp_documentos','sp_solicitud',
         ];
         foreach ($override as $campo) {
             if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
@@ -853,7 +854,6 @@ class ProcesosController extends BaseController
             'acta_parcial'       => 'ActaParcial',
             'acta_definitiva'    => 'ActaDefinitiva',
             'solicitud_pago'     => 'SolicitudPago',
-            'informe_conformidad'=> 'InformeConformidad',
         ];
         $nombreArchivo = ($titulos[$tipo] ?? $tipo) . '_' . preg_replace('/[^A-Za-z0-9\-]/', '_', $proceso['numero_proceso']) . '.pdf';
 

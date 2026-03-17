@@ -22,14 +22,24 @@ $seccionesPorTipo = [
          'ayuda' => 'Canales de contacto, tiempos de respuesta y alcance de la garantía.'],
     ],
     'acta_parcial' => [
-        ['key' => 'ap_objeto',     'label' => '1. Objeto',                'icono' => 'bi-file-text',
-         'ayuda' => 'Descripción del alcance de esta entrega parcial dentro del contrato.'],
+        ['key' => 'ap_antecedentes','label' => '1. Antecedentes',         'icono' => 'bi-journal-text',
+         'ayuda' => 'Contexto del contrato y alcance de esta entrega parcial.'],
         ['key' => 'ap_detalle',    'label' => '2. Detalle de lo Entregado','icono' => 'bi-list-check',
          'ayuda' => 'Módulos, servicios o avances entregados en esta instancia.'],
         ['key' => 'ap_pendientes', 'label' => '3. Pendientes',            'icono' => 'bi-hourglass-split',
          'ayuda' => 'Elementos que aún no han sido completados y quedan para entregas posteriores.'],
-        ['key' => 'ap_conformidad','label' => '4. Conformidad',           'icono' => 'bi-check-circle',
-         'ayuda' => 'Declaración de conformidad parcial y compromisos de las partes.'],
+        ['key' => 'ap_conformidad','label' => '4. Conformidad Parcial',   'icono' => 'bi-check-circle',
+         'ayuda' => 'Declaración de conformidad parcial y compromisos de entrega definitiva.'],
+    ],
+    'solicitud_pago' => [
+        ['key' => 'sp_antecedentes','label' => '1. Antecedentes',          'icono' => 'bi-journal-text',
+         'ayuda' => 'Referencia al proceso de contratación, objeto y montos.'],
+        ['key' => 'sp_justificacion','label' => '2. Justificación del Pago','icono' => 'bi-card-checklist',
+         'ayuda' => 'Sustento de los bienes/servicios entregados y documentos de respaldo.'],
+        ['key' => 'sp_documentos',  'label' => '3. Documentos Adjuntos',   'icono' => 'bi-paperclip',
+         'ayuda' => 'Lista de documentos que se adjuntan a la solicitud.'],
+        ['key' => 'sp_solicitud',   'label' => '4. Petición Formal',       'icono' => 'bi-send',
+         'ayuda' => 'Párrafo de cierre con la solicitud explícita del pago.'],
     ],
     'acta_definitiva' => [
         ['key' => 'ad_antecedentes','label' => '1. Antecedentes',          'icono' => 'bi-journal-text',
@@ -167,12 +177,14 @@ if ($tipo === 'informe_tecnico') {
         . "Definitiva en dos ejemplares de igual valor y efecto legal.</p>";
 
 } elseif ($tipo === 'acta_parcial') {
-    $sugerencias['ap_objeto'] =
-        "<p>En el marco del proceso de contratación <strong>{$numero}</strong>, cuyo objeto es "
-        . "<strong>{$objeto}</strong>, celebrado con la institución <strong>{$inst}</strong> "
-        . "por un monto de <strong>\${$monto}</strong> más IVA y un plazo de <strong>{$plazo} días</strong>, "
-        . "el proveedor <strong>{$prov}</strong> procede a realizar la presente entrega parcial de los "
-        . "bienes y/o servicios contratados, conforme a los avances alcanzados a la fecha.</p>";
+    $sugerencias['ap_antecedentes'] =
+        "<p>En la ciudad de <strong>{$inst}</strong>, en el marco del proceso de contratación "
+        . "<strong>{$numero}</strong>, cuyo objeto es <strong>{$objeto}</strong>, celebrado entre "
+        . "<strong>{$inst}</strong> en calidad de contratante, y <strong>{$prov}</strong> en calidad "
+        . "de proveedor; con un monto de <strong>\${$monto}</strong> más IVA y un plazo de "
+        . "<strong>{$plazo} días calendario</strong> (del {$fi} al {$ff}), las partes comparecen "
+        . "a suscribir la presente Acta de Entrega Parcial, en virtud de los avances alcanzados "
+        . "a la fecha en la ejecución del contrato.</p>";
 
     $avance = strip_tags($proceso['especificaciones_tecnicas'] ?? '');
     $sugerencias['ap_detalle'] = $avance
@@ -203,6 +215,42 @@ if ($tipo === 'informe_tecnico') {
         . "<p>La presente acta no exime al proveedor de cumplir con la totalidad de las obligaciones "
         . "contractuales en los plazos establecidos. La entrega definitiva se realizará una vez "
         . "completados todos los elementos pendientes indicados en la sección anterior.</p>";
+
+} elseif ($tipo === 'solicitud_pago') {
+    $sugerencias['sp_antecedentes'] =
+        "<p>Por medio de la presente, yo, <strong>{$rep}</strong>, Representante Legal de "
+        . "<strong>{$prov}</strong>, RUC <strong>{$ruc}</strong>, me dirijo a usted, "
+        . "<strong>{$proceso['administrador_nombre'] ?? 'Administrador del Contrato'}</strong>, "
+        . "en su calidad de <strong>{$proceso['administrador_cargo'] ?? 'Administrador del Contrato'}</strong> "
+        . "de <strong>{$inst}</strong>, con el fin de presentar la solicitud de pago correspondiente "
+        . "al proceso de contratación <strong>{$numero}</strong>, cuyo objeto es: "
+        . "<strong>{$objeto}</strong>, por un monto contractual de <strong>\${$monto}</strong> más IVA.</p>";
+
+    $sugerencias['sp_justificacion'] =
+        "<p>En cumplimiento de las obligaciones contractuales establecidas en el proceso "
+        . "<strong>{$numero}</strong>, la empresa <strong>{$prov}</strong> ha ejecutado en su "
+        . "totalidad los bienes y/o servicios objeto del contrato, conforme a las especificaciones "
+        . "técnicas acordadas y dentro del plazo establecido de <strong>{$plazo} días calendario</strong>.</p>"
+        . "<p>La entrega ha sido debidamente verificada y aceptada por la institución contratante, "
+        . "conforme consta en el Acta de Entrega-Recepción suscrita por las partes.</p>";
+
+    $sugerencias['sp_documentos'] =
+        "<ul>"
+        . "<li>Acta de Entrega-Recepción (Parcial/Definitiva) debidamente suscrita.</li>"
+        . "<li>Informe Técnico de Entrega del proveedor.</li>"
+        . "<li>Factura N° ________ por el valor de <strong>\${$monto}</strong> más IVA.</li>"
+        . "<li>Garantía Técnica (si aplica).</li>"
+        . "<li>Copia del contrato u orden de compra N° <strong>{$numero}</strong>.</li>"
+        . "</ul>";
+
+    $sugerencias['sp_solicitud'] =
+        "<p>En virtud de lo expuesto y de haber dado cumplimiento íntegro a las obligaciones "
+        . "contractuales, solicito comedidamente se sirva gestionar y autorizar el pago "
+        . "correspondiente a la brevedad posible, conforme a la forma de pago establecida en "
+        . "el contrato y a lo dispuesto en la normativa vigente.</p>"
+        . "<p>Agradezco la atención brindada a la presente solicitud.</p>"
+        . "<p>Atentamente,<br><strong>{$rep}</strong><br>Representante Legal<br>"
+        . "<strong>{$prov}</strong> — RUC: {$ruc}</p>";
 
 } else {
     $sugerencias['especificaciones_tecnicas'] = $proceso['especificaciones_tecnicas'] ?? '';

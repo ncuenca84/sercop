@@ -16,7 +16,6 @@
     'acta_parcial'       => ['📋','Acta de Entrega Parcial','bg-secondary'],
     'acta_definitiva'    => ['✅','Acta Entrega Definitiva','bg-success'],
     'solicitud_pago'     => ['💰','Solicitud de Pago','bg-success'],
-    'informe_conformidad'=> ['✔️','Informe de Conformidad','bg-dark'],
   ];
   $tiposConPlantilla = array_column($plantillas,'tipo');
   foreach($tiposStd as $tipo=>[$emoji,$label,$color]): ?>
