@@ -14,13 +14,14 @@ class DocumentoService
         $vars = self::buildVars($proceso, $tenantId, $logoUrl);
 
         switch ($tipo) {
-            case 'informe_tecnico':    return self::renderizar(self::tplInformeTecnico(),    $vars, $proceso);
-            case 'acta_provisional':   return self::renderizar(self::tplActaEntrega('Provisional'), $vars, $proceso);
-            case 'acta_definitiva':    return self::renderizar(self::tplActaEntrega('Definitiva'),  $vars, $proceso);
-            case 'garantia_tecnica':   return self::renderizar(self::tplGarantiaTecnica(),   $vars, $proceso);
-            case 'solicitud_pago':     return self::renderizar(self::tplSolicitudPago(),     $vars, $proceso);
-            case 'informe_conformidad':return self::renderizar(self::tplInformeConformidad(),$vars, $proceso);
-            default:                   return self::renderizar(self::tplInformeTecnico(),    $vars, $proceso);
+            case 'informe_tecnico':    return self::renderizar(self::tplInformeTecnico(),          $vars, $proceso);
+            case 'garantia_tecnica':   return self::renderizar(self::tplGarantiaTecnica(),         $vars, $proceso);
+            case 'acta_parcial':       return self::renderizar(self::tplActaParcial(),             $vars, $proceso);
+            case 'acta_provisional':   return self::renderizar(self::tplActaEntrega('Provisional'),$vars, $proceso);
+            case 'acta_definitiva':    return self::renderizar(self::tplActaEntrega('Definitiva'), $vars, $proceso);
+            case 'solicitud_pago':     return self::renderizar(self::tplSolicitudPago(),           $vars, $proceso);
+            case 'informe_conformidad':return self::renderizar(self::tplInformeConformidad(),      $vars, $proceso);
+            default:                   return self::renderizar(self::tplInformeTecnico(),          $vars, $proceso);
         }
     }
 
@@ -108,6 +109,11 @@ class DocumentoService
             '{{gt.objeto}}'              => self::htmlSeguro($proceso['gt_objeto']    ?? ''),
             '{{gt.vigencia}}'            => self::htmlSeguro($proceso['gt_vigencia']  ?? ''),
             '{{gt.cobertura}}'           => self::htmlSeguro($proceso['gt_cobertura'] ?? ''),
+            // Secciones Acta de Entrega Parcial
+            '{{ap.objeto}}'              => self::htmlSeguro($proceso['ap_objeto']      ?? ''),
+            '{{ap.detalle}}'             => self::htmlSeguro($proceso['ap_detalle']     ?? ''),
+            '{{ap.pendientes}}'          => self::htmlSeguro($proceso['ap_pendientes']  ?? ''),
+            '{{ap.conformidad}}'         => self::htmlSeguro($proceso['ap_conformidad'] ?? ''),
             // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
@@ -334,6 +340,84 @@ class DocumentoService
                     <div class="firma-linea">
                         <div class="firma-nombre">{{proveedor.representante}}</div>
                         <div class="firma-cargo">Representante Legal<br>{{proveedor.razon_social}}</div>
+                    </div>
+                </div>
+                <div class="firma-box">
+                    <div class="firma-linea">
+                        <div class="firma-nombre">{{institucion.administrador}}</div>
+                        <div class="firma-cargo">{{institucion.cargo_admin}}<br>{{institucion.nombre}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-doc">Documento generado por sistema Brixs Contratación — {{doc.fecha}}</div>
+        </div></body></html>';
+    }
+
+    // ── Acta de Entrega Parcial ───────────────────────────────────────────
+    private static function tplActaParcial(): string
+    {
+        return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+        <title>Acta de Entrega Parcial — {{proceso.numero}}</title>'
+        . self::css() . '</head><body>'
+        . self::btnBar('Acta de Entrega Parcial')
+        . '<div class="page">
+            <div class="doc-header">
+                <div class="doc-header-left">{{logo_html}}</div>
+                <div class="doc-header-right">
+                    <div class="doc-title">Acta de Entrega Parcial</div>
+                    <div class="doc-numero">N° {{doc.numero}} &nbsp;|&nbsp; {{doc.lugar}}, {{doc.fecha}}</div>
+                </div>
+            </div>
+
+            <div class="doc-meta"><table>
+                <tr><td>Proceso:</td><td>{{proceso.numero}}</td></tr>
+                <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
+                <tr><td>Contratante:</td><td>{{institucion.nombre}} — RUC: {{institucion.ruc}}</td></tr>
+                <tr><td>Administrador:</td><td>{{institucion.administrador}}, {{institucion.cargo_admin}}</td></tr>
+                <tr><td>Proveedor:</td><td>{{proveedor.razon_social}} — RUC: {{proveedor.ruc}}</td></tr>
+                <tr><td>Representante:</td><td>{{proveedor.representante}}</td></tr>
+                <tr><td>Monto Total:</td><td>{{proceso.monto}}</td></tr>
+                <tr><td>Plazo Contractual:</td><td>{{proceso.plazo}}</td></tr>
+            </table></div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">1. Objeto</div>
+                <div class="seccion-body">{{ap.objeto}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">2. Detalle de lo Entregado</div>
+                <div class="seccion-body">{{ap.detalle}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">Entregables del Contrato</div>
+                {{entregables_tabla}}
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">3. Pendientes</div>
+                <div class="seccion-body">{{ap.pendientes}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">4. Conformidad</div>
+                <div class="seccion-body">{{ap.conformidad}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-body">
+                    En fe de lo cual, las partes suscriben la presente Acta de Entrega Parcial
+                    en la ciudad de {{doc.lugar}}, el {{doc.fecha}}.
+                </div>
+            </div>
+
+            <div class="firma-section">
+                <div class="firma-box">
+                    <div class="firma-linea">
+                        <div class="firma-nombre">{{proveedor.representante}}</div>
+                        <div class="firma-cargo">Representante Legal<br>{{proveedor.razon_social}}<br>RUC: {{proveedor.ruc}}</div>
                     </div>
                 </div>
                 <div class="firma-box">

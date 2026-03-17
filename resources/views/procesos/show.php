@@ -21,6 +21,7 @@
         <?php foreach([
           'informe_tecnico'    => ['&#x1F4CA;','Informe Técnico de Entrega'],
           'garantia_tecnica'   => ['&#x1F6E1;','Garantía Técnica'],
+          'acta_parcial'       => ['&#x1F4CB;','Acta de Entrega Parcial'],
           'acta_provisional'   => ['&#x1F4DD;','Acta Entrega Provisional'],
           'acta_definitiva'    => ['&#x2705;','Acta Entrega Definitiva'],
           'solicitud_pago'     => ['&#x1F4B0;','Solicitud de Pago'],

@@ -21,6 +21,16 @@ $seccionesPorTipo = [
         ['key' => 'gt_cobertura', 'label' => '3. Cobertura del Soporte',  'icono' => 'bi-headset',
          'ayuda' => 'Canales de contacto, tiempos de respuesta y alcance de la garantía.'],
     ],
+    'acta_parcial' => [
+        ['key' => 'ap_objeto',     'label' => '1. Objeto',                'icono' => 'bi-file-text',
+         'ayuda' => 'Descripción del alcance de esta entrega parcial dentro del contrato.'],
+        ['key' => 'ap_detalle',    'label' => '2. Detalle de lo Entregado','icono' => 'bi-list-check',
+         'ayuda' => 'Módulos, servicios o avances entregados en esta instancia.'],
+        ['key' => 'ap_pendientes', 'label' => '3. Pendientes',            'icono' => 'bi-hourglass-split',
+         'ayuda' => 'Elementos que aún no han sido completados y quedan para entregas posteriores.'],
+        ['key' => 'ap_conformidad','label' => '4. Conformidad',           'icono' => 'bi-check-circle',
+         'ayuda' => 'Declaración de conformidad parcial y compromisos de las partes.'],
+    ],
 ];
 
 $secciones             = $seccionesPorTipo[$tipo] ?? [
@@ -103,6 +113,44 @@ if ($tipo === 'informe_tecnico') {
         . "<p><strong>Alcance de la cobertura:</strong> La garantía cubre defectos de fabricación, fallas de "
         . "funcionamiento y problemas técnicos no atribuibles al uso indebido, modificaciones no autorizadas "
         . "o fuerza mayor.</p>";
+
+} elseif ($tipo === 'acta_parcial') {
+    $sugerencias['ap_objeto'] =
+        "<p>En el marco del proceso de contratación <strong>{$numero}</strong>, cuyo objeto es "
+        . "<strong>{$objeto}</strong>, celebrado con la institución <strong>{$inst}</strong> "
+        . "por un monto de <strong>\${$monto}</strong> más IVA y un plazo de <strong>{$plazo} días</strong>, "
+        . "el proveedor <strong>{$prov}</strong> procede a realizar la presente entrega parcial de los "
+        . "bienes y/o servicios contratados, conforme a los avances alcanzados a la fecha.</p>";
+
+    $avance = strip_tags($proceso['especificaciones_tecnicas'] ?? '');
+    $sugerencias['ap_detalle'] = $avance
+        ? "<p>En la presente entrega parcial se han completado los siguientes módulos, servicios o avances:</p>"
+          . "<ul><li>" . nl2br(htmlspecialchars(trim($avance))) . "</li></ul>"
+        : "<p>Detallar aquí los módulos implementados, servicios configurados o avances del proyecto "
+          . "que se entregan en esta instancia. Incluir porcentaje de avance si aplica.</p>"
+          . "<ul><li>Ítem 1: descripción y estado.</li><li>Ítem 2: descripción y estado.</li></ul>";
+
+    $sugerencias['ap_pendientes'] = $proceso['metodologia_trabajo']
+        ? "<p>A la fecha de la presente entrega parcial, se encuentran pendientes de ejecución los "
+          . "siguientes elementos:</p><ul><li>"
+          . nl2br(htmlspecialchars(strip_tags($proceso['metodologia_trabajo'])))
+          . "</li></ul>"
+        : "<p>A la fecha de la presente entrega parcial, quedan pendientes de cumplimiento los "
+          . "siguientes elementos:</p>"
+          . "<ul>"
+          . "<li>Describir aquí los ítems o módulos aún no completados.</li>"
+          . "<li>Indicar el plazo previsto para su entrega.</li>"
+          . "</ul>"
+          . "<p>Las partes acuerdan que los elementos pendientes serán entregados conforme al "
+          . "cronograma establecido en el contrato.</p>";
+
+    $sugerencias['ap_conformidad'] =
+        "<p>Las partes comparecientes declaran su conformidad con los bienes y/o servicios "
+        . "entregados en la presente instancia parcial, los cuales han sido revisados y verificados "
+        . "conforme a las especificaciones técnicas del proceso <strong>{$numero}</strong>.</p>"
+        . "<p>La presente acta no exime al proveedor de cumplir con la totalidad de las obligaciones "
+        . "contractuales en los plazos establecidos. La entrega definitiva se realizará una vez "
+        . "completados todos los elementos pendientes indicados en la sección anterior.</p>";
 
 } else {
     $sugerencias['especificaciones_tecnicas'] = $proceso['especificaciones_tecnicas'] ?? '';

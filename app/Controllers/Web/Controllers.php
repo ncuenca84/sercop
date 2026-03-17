@@ -701,6 +701,7 @@ class ProcesosController extends BaseController
         $titulos = [
             'informe_tecnico'    => 'Informe Técnico de Entrega',
             'garantia_tecnica'   => 'Certificado de Garantía Técnica',
+            'acta_parcial'       => 'Acta de Entrega Parcial',
             'acta_provisional'   => 'Acta de Entrega Provisional',
             'acta_definitiva'    => 'Acta de Entrega Definitiva',
             'solicitud_pago'     => 'Solicitud de Pago',
@@ -733,6 +734,8 @@ class ProcesosController extends BaseController
             'it_secciones_extra',
             // Secciones Garantía Técnica
             'gt_objeto','gt_vigencia','gt_cobertura',
+            // Secciones Acta de Entrega Parcial
+            'ap_objeto','ap_detalle','ap_pendientes','ap_conformidad',
         ];
         foreach ($override as $campo) {
             if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
@@ -846,6 +849,7 @@ class ProcesosController extends BaseController
         $titulos = [
             'informe_tecnico'    => 'InformeTecnico',
             'garantia_tecnica'   => 'Garantia',
+            'acta_parcial'       => 'ActaParcial',
             'acta_provisional'   => 'ActaProvisional',
             'acta_definitiva'    => 'ActaDefinitiva',
             'solicitud_pago'     => 'SolicitudPago',
