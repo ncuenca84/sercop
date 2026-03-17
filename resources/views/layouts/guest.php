@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= e($title ?? '') ?> — <?= APP_NAME ?></title>
+  <title><?= e($title ?? '') ?> — Contratación Pública EC</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
@@ -26,7 +26,7 @@
       <div class="login-card card border-0">
         <div class="login-header">
           <div class="flag-ec mb-2">🇪🇨</div>
-          <h1><i class="bi bi-bank me-2"></i><?= APP_NAME ?></h1>
+          <h1><i class="bi bi-bank me-2"></i>Contratación Pública EC</h1>
           <small>Sistema de Gestión de Contratación Pública</small>
         </div>
         <div class="login-body">
@@ -39,7 +39,7 @@
           <?= $content ?>
         </div>
         <div class="card-footer text-center text-muted small py-3" style="border-radius:0 0 16px 16px">
-          &copy; <?= date('Y') ?> <?= APP_NAME ?> — LOSNCP Ecuador
+          &copy; <?= date('Y') ?> Contratación Pública EC — LOSNCP Ecuador
         </div>
       </div>
     </div>
