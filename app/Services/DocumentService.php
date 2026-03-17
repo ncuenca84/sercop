@@ -103,9 +103,35 @@ class DocumentoService
             '{{it.desarrollo}}'          => self::htmlSeguro($proceso['it_desarrollo']      ?? ''),
             '{{it.conclusiones}}'        => self::htmlSeguro($proceso['it_conclusiones']    ?? ''),
             '{{it.recomendaciones}}'     => self::htmlSeguro($proceso['it_recomendaciones'] ?? ''),
+            '{{it.secciones_extra}}'     => self::buildSeccionesExtra($proceso['it_secciones_extra'] ?? ''),
+            // Secciones Garantía Técnica
+            '{{gt.objeto}}'              => self::htmlSeguro($proceso['gt_objeto']    ?? ''),
+            '{{gt.vigencia}}'            => self::htmlSeguro($proceso['gt_vigencia']  ?? ''),
+            '{{gt.cobertura}}'           => self::htmlSeguro($proceso['gt_cobertura'] ?? ''),
             // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
+    }
+
+    /**
+     * Decodifica el JSON de secciones personalizadas del Informe Técnico y
+     * devuelve el HTML de las secciones extra listo para insertar en la plantilla.
+     */
+    private static function buildSeccionesExtra(string $json): string
+    {
+        if ($json === '') return '';
+        $items = json_decode($json, true);
+        if (!is_array($items) || empty($items)) return '';
+
+        $html = '';
+        foreach ($items as $item) {
+            $titulo    = htmlspecialchars($item['titulo']   ?? '');
+            $contenido = self::htmlSeguro($item['contenido'] ?? '');
+            if ($titulo === '' && $contenido === '') continue;
+            $tituloHtml = $titulo !== '' ? "<div class=\"seccion-titulo\">{$titulo}</div>" : '';
+            $html .= "<div class=\"seccion\">{$tituloHtml}<div class=\"seccion-body\">{$contenido}</div></div>\n";
+        }
+        return $html;
     }
 
     /**
@@ -301,6 +327,8 @@ class DocumentoService
                 <div class="seccion-body">{{it.recomendaciones}}</div>
             </div>
 
+            {{it.secciones_extra}}
+
             <div class="firma-section">
                 <div class="firma-box">
                     <div class="firma-linea">
@@ -410,47 +438,37 @@ class DocumentoService
                 </div>
             </div>
 
-            <div style="margin: 30px 0">
-                <div class="doc-meta"><table>
-                    <tr><td>Proceso:</td><td>{{proceso.numero}}</td></tr>
-                    <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
-                    <tr><td>Beneficiario:</td><td>{{institucion.nombre}}</td></tr>
-                    <tr><td>Proveedor:</td><td>{{proveedor.razon_social}} — RUC: {{proveedor.ruc}}</td></tr>
-                    <tr><td>Monto:</td><td>{{proceso.monto}}</td></tr>
-                    <tr><td>Fecha de Emisión:</td><td>{{doc.fecha}}</td></tr>
-                </table></div>
+            <div class="doc-meta"><table>
+                <tr><td>Proceso:</td><td>{{proceso.numero}}</td></tr>
+                <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
+                <tr><td>Beneficiario:</td><td>{{institucion.nombre}}</td></tr>
+                <tr><td>Administrador:</td><td>{{institucion.administrador}} — {{institucion.cargo_admin}}</td></tr>
+                <tr><td>Proveedor:</td><td>{{proveedor.razon_social}} &nbsp;|&nbsp; RUC: {{proveedor.ruc}}</td></tr>
+                <tr><td>Representante:</td><td>{{proveedor.representante}}</td></tr>
+                <tr><td>Monto:</td><td>{{proceso.monto}}</td></tr>
+                <tr><td>Fecha de Emisión:</td><td>{{doc.fecha}}</td></tr>
+            </table></div>
 
-                <div class="seccion">
-                    <div class="seccion-body">
-                        La empresa <strong>{{proveedor.razon_social}}</strong>, con RUC <strong>{{proveedor.ruc}}</strong>,
-                        representada por <strong>{{proveedor.representante}}</strong>, CERTIFICA que los bienes
-                        y/o servicios entregados en virtud del proceso de contratación <strong>{{proceso.numero}}</strong>
-                        cuentan con garantía técnica en los siguientes términos:
-                    </div>
-                </div>
+            <div class="seccion">
+                <div class="seccion-titulo">1. Objeto de la Garantía</div>
+                <div class="seccion-body">{{gt.objeto}}</div>
+            </div>
 
-                <div class="seccion">
-                    <div class="seccion-titulo">Alcance de la Garantía</div>
-                    <div class="seccion-body">{{proceso.especificaciones}}</div>
-                </div>
+            <div class="seccion">
+                <div class="seccion-titulo">2. Vigencia</div>
+                <div class="seccion-body">{{gt.vigencia}}</div>
+            </div>
 
-                <div class="seccion">
-                    <div class="seccion-titulo">Condiciones</div>
-                    <div class="seccion-body">
-                        La garantía cubre defectos de fabricación, funcionamiento deficiente y fallas
-                        técnicas no atribuibles al uso indebido por parte del beneficiario.
-                        Para hacer efectiva la garantía, comunicarse a: <strong>{{proveedor.email}}</strong>
-                        o al teléfono <strong>{{proveedor.telefono}}</strong>.
-                        <br><br>{{doc.observaciones}}
-                    </div>
-                </div>
+            <div class="seccion">
+                <div class="seccion-titulo">3. Cobertura del Soporte</div>
+                <div class="seccion-body">{{gt.cobertura}}</div>
             </div>
 
             <div class="firma-section">
                 <div class="firma-box">
                     <div class="firma-linea">
                         <div class="firma-nombre">{{proveedor.representante}}</div>
-                        <div class="firma-cargo">Representante Legal<br>{{proveedor.razon_social}}</div>
+                        <div class="firma-cargo">Representante Legal<br>{{proveedor.razon_social}}<br>RUC: {{proveedor.ruc}}</div>
                     </div>
                 </div>
             </div>

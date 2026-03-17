@@ -1,5 +1,5 @@
 <?php
-// ─── Secciones editables por tipo de documento ─────────────────────────────
+// ─── Secciones fijas por tipo de documento ─────────────────────────────────
 $seccionesPorTipo = [
     'informe_tecnico' => [
         ['key' => 'it_antecedentes',    'label' => '1. Antecedentes',    'icono' => 'bi-journal-text',
@@ -13,25 +13,41 @@ $seccionesPorTipo = [
         ['key' => 'it_recomendaciones', 'label' => '5. Recomendaciones', 'icono' => 'bi-lightbulb',
          'ayuda' => 'Acciones sugeridas: acta de entrega, pago, archivo del expediente, etc.'],
     ],
+    'garantia_tecnica' => [
+        ['key' => 'gt_objeto',    'label' => '1. Objeto de la Garantía',  'icono' => 'bi-shield-check',
+         'ayuda' => 'Bienes/servicios amparados, proveedor y proceso de origen.'],
+        ['key' => 'gt_vigencia',  'label' => '2. Vigencia',               'icono' => 'bi-calendar-check',
+         'ayuda' => 'Período de cobertura a partir del Acta de Entrega-Recepción Definitiva.'],
+        ['key' => 'gt_cobertura', 'label' => '3. Cobertura del Soporte',  'icono' => 'bi-headset',
+         'ayuda' => 'Canales de contacto, tiempos de respuesta y alcance de la garantía.'],
+    ],
 ];
-$secciones = $seccionesPorTipo[$tipo] ?? [
+
+$secciones             = $seccionesPorTipo[$tipo] ?? [
     ['key' => 'especificaciones_tecnicas', 'label' => 'Especificaciones Técnicas', 'icono' => 'bi-card-text', 'ayuda' => ''],
     ['key' => 'metodologia_trabajo',       'label' => 'Metodología de Trabajo',   'icono' => 'bi-card-text', 'ayuda' => ''],
     ['key' => 'doc_observaciones',         'label' => 'Observaciones',            'icono' => 'bi-card-text', 'ayuda' => ''],
 ];
+$admiteSeccionesExtra  = ($tipo === 'informe_tecnico');
+
+// ─── Variables comunes del proceso ─────────────────────────────────────────
+$monto    = number_format((float)($proceso['monto_total'] ?? 0), 2);
+$plazo    = (int)($proceso['plazo_dias'] ?? 0);
+$numero   = htmlspecialchars($proceso['numero_proceso'] ?? '');
+$objeto   = htmlspecialchars($proceso['objeto_contratacion'] ?? '');
+$inst     = htmlspecialchars($proceso['institucion_nombre'] ?? '');
+$fi       = htmlspecialchars($proceso['fecha_inicio'] ?? '—');
+$ff       = htmlspecialchars($proceso['fecha_fin']    ?? '—');
+$prov     = htmlspecialchars($_SESSION['tenant_nombre']        ?? '');
+$ruc      = htmlspecialchars($_SESSION['tenant_ruc']           ?? '');
+$rep      = htmlspecialchars($_SESSION['tenant_representante'] ?? '');
+$telefono = htmlspecialchars($_SESSION['tenant_telefono']      ?? '');
+$email    = htmlspecialchars($_SESSION['tenant_email']         ?? '');
 
 // ─── Sugerencias pre-llenadas desde datos del proceso (Fase 1) ─────────────
 $sugerencias = [];
-if ($tipo === 'informe_tecnico') {
-    $monto   = number_format((float)($proceso['monto_total'] ?? 0), 2);
-    $plazo   = (int)($proceso['plazo_dias'] ?? 0);
-    $numero  = htmlspecialchars($proceso['numero_proceso'] ?? '');
-    $objeto  = htmlspecialchars($proceso['objeto_contratacion'] ?? '');
-    $inst    = htmlspecialchars($proceso['institucion_nombre'] ?? '');
-    $fi      = htmlspecialchars($proceso['fecha_inicio'] ?? '—');
-    $ff      = htmlspecialchars($proceso['fecha_fin']    ?? '—');
-    $prov    = htmlspecialchars($_SESSION['tenant_nombre'] ?? '');
 
+if ($tipo === 'informe_tecnico') {
     $sugerencias['it_antecedentes'] =
         "<p>En cumplimiento del proceso de contratación <strong>{$numero}</strong>, cuyo objeto es "
         . "<strong>{$objeto}</strong>, celebrado con la institución <strong>{$inst}</strong>; por un monto de "
@@ -56,6 +72,38 @@ if ($tipo === 'informe_tecnico') {
         ?: "<p>Se recomienda proceder con la suscripción del Acta de Entrega-Recepción Provisional y tramitar "
         . "el pago correspondiente conforme a la forma de pago establecida en el contrato.</p>"
         . "<p>Archivar el presente informe en el expediente digital del proceso <strong>{$numero}</strong>.</p>";
+
+} elseif ($tipo === 'garantia_tecnica') {
+    $sugerencias['gt_objeto'] =
+        "<p>La empresa <strong>{$prov}</strong>, con RUC <strong>{$ruc}</strong>, representada por "
+        . "<strong>{$rep}</strong> en su calidad de Representante Legal, CERTIFICA que los bienes y/o servicios "
+        . "entregados en virtud del proceso de contratación <strong>{$numero}</strong>, cuyo objeto es: "
+        . "<em>{$objeto}</em>, se encuentran amparados por garantía técnica en los términos que a continuación se detallan.</p>";
+
+    $sugerencias['gt_vigencia'] =
+        "<p>La presente garantía técnica tiene una vigencia de <strong>doce (12) meses</strong> contados a partir "
+        . "de la fecha de suscripción del Acta de Entrega-Recepción Definitiva del proceso <strong>{$numero}</strong>.</p>"
+        . "<p>Durante el período de vigencia, el proveedor atenderá sin costo adicional para la institución "
+        . "contratante cualquier falla o defecto técnico que no sea atribuible al mal uso, negligencia o "
+        . "modificaciones no autorizadas por parte del beneficiario.</p>";
+
+    $contactos = '<ul>';
+    if ($email)    $contactos .= "<li><strong>Correo electrónico:</strong> {$email}</li>";
+    if ($telefono) $contactos .= "<li><strong>Teléfono / WhatsApp:</strong> {$telefono}</li>";
+    $contactos .= "<li><strong>Empresa:</strong> {$prov}</li></ul>";
+
+    $sugerencias['gt_cobertura'] =
+        "<p>Para hacer efectiva la presente garantía, la institución <strong>{$inst}</strong> deberá "
+        . "comunicarse con el proveedor a través de los siguientes canales de atención:</p>"
+        . $contactos
+        . "<p><strong>Tiempo de respuesta:</strong> El proveedor dará respuesta a la solicitud de soporte "
+        . "en un plazo máximo de <strong>48 horas hábiles</strong> desde la recepción de la notificación. "
+        . "En caso de requerir intervención técnica en sitio, el plazo máximo de atención será de "
+        . "<strong>72 horas hábiles</strong>.</p>"
+        . "<p><strong>Alcance de la cobertura:</strong> La garantía cubre defectos de fabricación, fallas de "
+        . "funcionamiento y problemas técnicos no atribuibles al uso indebido, modificaciones no autorizadas "
+        . "o fuerza mayor.</p>";
+
 } else {
     $sugerencias['especificaciones_tecnicas'] = $proceso['especificaciones_tecnicas'] ?? '';
     $sugerencias['metodologia_trabajo']       = $proceso['metodologia_trabajo']       ?? '';
@@ -81,7 +129,8 @@ if ($tipo === 'informe_tecnico') {
 .ck-editor__editable { min-height: 140px; }
 .ck-editor__editable img { max-width: 100%; height: auto; }
 .seccion-editor { border-left: 3px solid #0d6efd; padding-left: 10px; margin-bottom: 4px; }
-.seccion-ayuda { font-size: 11px; color: #6c757d; margin-bottom: 6px; }
+.seccion-extra  { border-left: 3px solid #fd7e14; padding-left: 10px; margin-bottom: 4px; }
+.seccion-ayuda  { font-size: 11px; color: #6c757d; margin-bottom: 6px; }
 </style>
 
 <div class="row g-3">
@@ -91,10 +140,14 @@ if ($tipo === 'informe_tecnico') {
       <?= csrf_field() ?>
       <input type="hidden" name="tipo" value="<?= e($tipo) ?>">
 
-      <!-- Hidden inputs sincronizados desde CKEditor -->
+      <!-- Hidden inputs para secciones fijas -->
 <?php foreach ($secciones as $sec): ?>
       <input type="hidden" name="<?= e($sec['key']) ?>" id="h_<?= e($sec['key']) ?>">
 <?php endforeach; ?>
+<?php if ($admiteSeccionesExtra): ?>
+      <!-- Hidden input para secciones personalizadas (JSON) -->
+      <input type="hidden" name="it_secciones_extra" id="h_it_secciones_extra">
+<?php endif; ?>
 
       <!-- ── Datos generales del documento ─────────────────────────────── -->
       <div class="card shadow-sm mb-3">
@@ -146,9 +199,11 @@ if ($tipo === 'informe_tecnico') {
       <div class="card shadow-sm mb-3">
         <div class="card-header fw-semibold small bg-primary text-white">
           <i class="bi bi-pencil-square me-1"></i>Contenido del Documento
-          <span class="fw-normal opacity-75 ms-2 small">Los campos se pre-llenan con datos del proceso</span>
+          <span class="fw-normal opacity-75 ms-2 small">Pre-llenado con datos del proceso</span>
         </div>
-        <div class="card-body row g-4">
+        <div class="card-body row g-4" id="contenedorSecciones">
+
+          <!-- Secciones fijas -->
 <?php foreach ($secciones as $sec): ?>
           <div class="col-12">
             <div class="seccion-editor">
@@ -162,6 +217,20 @@ if ($tipo === 'informe_tecnico') {
             </div>
           </div>
 <?php endforeach; ?>
+
+<?php if ($admiteSeccionesExtra): ?>
+          <!-- Secciones personalizadas (dinámicas) -->
+          <div id="extraSecciones" class="col-12 row g-4 m-0 p-0"></div>
+
+          <!-- Botón agregar sección -->
+          <div class="col-12">
+            <button type="button" class="btn btn-outline-warning btn-sm" onclick="agregarSeccion()">
+              <i class="bi bi-plus-circle me-1"></i>Agregar sección personalizada
+            </button>
+            <span class="text-muted small ms-2">Opcional — para agregar contenido adicional al documento</span>
+          </div>
+<?php endif; ?>
+
         </div>
         <div class="card-footer">
           <button type="submit" class="btn btn-primary w-100">
@@ -181,12 +250,12 @@ if ($tipo === 'informe_tecnico') {
       </div>
       <div class="card-body p-0">
         <table class="table table-sm mb-0">
-          <tr><th class="text-muted ps-3" width="38%">Institución</th><td><?= e($proceso['institucion_nombre'] ?? '') ?></td></tr>
+          <tr><th class="text-muted ps-3" width="40%">Institución</th><td><?= e($proceso['institucion_nombre'] ?? '') ?></td></tr>
           <tr><th class="text-muted ps-3">Administrador</th><td><?= e($proceso['administrador_nombre'] ?? '') ?></td></tr>
           <tr><th class="text-muted ps-3">Cargo</th><td><?= e($proceso['administrador_cargo'] ?? '') ?></td></tr>
           <tr><th class="text-muted ps-3">CPC</th><td><?= e($proceso['cpc'] ?? '—') ?></td></tr>
           <tr><th class="text-muted ps-3">Fecha inicio</th><td><?= e($proceso['fecha_inicio'] ?? '—') ?></td></tr>
-          <tr><th class="text-muted ps-3">Fecha fin</th><td><?= e($proceso['fecha_fin'] ?? '—') ?></td></tr>
+          <tr><th class="text-muted ps-3">Fecha fin</th><td><?= e($proceso['fecha_fin']    ?? '—') ?></td></tr>
           <tr><th class="text-muted ps-3">Monto</th><td><strong>$<?= number_format((float)($proceso['monto_total']??0),2) ?></strong></td></tr>
           <tr><th class="text-muted ps-3">Plazo</th><td><?= (int)($proceso['plazo_dias']??0) ?> días</td></tr>
         </table>
@@ -198,10 +267,13 @@ if ($tipo === 'informe_tecnico') {
         <i class="bi bi-lightbulb me-1 text-warning"></i>Instrucciones
       </div>
       <div class="card-body small text-muted">
-        <p><i class="bi bi-magic text-primary me-1"></i>Cada sección viene <strong>pre-llenada</strong> con los datos registrados en la Fase 1. Edita el texto según lo que corresponda.</p>
-        <p><i class="bi bi-fonts text-secondary me-1"></i>Usa <strong>negrita, cursiva, listas y tablas</strong> desde la barra de cada editor.</p>
-        <p><i class="bi bi-image text-success me-1"></i>Para insertar imágenes: botón <strong>🖼</strong> en la barra o pega directamente (Ctrl+V).</p>
-        <p class="mb-0"><i class="bi bi-folder me-1"></i>Al generar, el documento queda guardado en el <strong>Expediente Digital</strong> del proceso.</p>
+        <p><i class="bi bi-magic text-primary me-1"></i>Cada sección viene <strong>pre-llenada</strong> con los datos del proceso. Edita según corresponda.</p>
+        <p><i class="bi bi-fonts text-secondary me-1"></i>Usa <strong>negrita, cursiva, listas y tablas</strong> en la barra de cada editor.</p>
+        <p><i class="bi bi-image text-success me-1"></i>Para imágenes: botón <strong>🖼</strong> en la barra o pega con Ctrl+V.</p>
+        <?php if ($admiteSeccionesExtra): ?>
+        <p><i class="bi bi-plus-circle text-warning me-1"></i>Puedes agregar <strong>secciones adicionales</strong> con el botón naranja al final del formulario.</p>
+        <?php endif; ?>
+        <p class="mb-0"><i class="bi bi-folder me-1"></i>Al generar, el documento queda en el <strong>Expediente Digital</strong>.</p>
       </div>
     </div>
 
@@ -232,14 +304,9 @@ const ckConfig = {
     Base64UploadAdapter, Link, BlockQuote, Indent
   ],
   toolbar: {
-    items: [
-      'heading', '|',
-      'bold', 'italic', 'underline', '|',
-      'bulletedList', 'numberedList', 'blockQuote', '|',
-      'insertImage', 'insertTable', 'link', '|',
-      'outdent', 'indent', '|',
-      'undo', 'redo'
-    ]
+    items: ['heading','|','bold','italic','underline','|',
+            'bulletedList','numberedList','blockQuote','|',
+            'insertImage','insertTable','link','|','outdent','indent','|','undo','redo']
   },
   image: {
     toolbar: ['imageStyle:inline','imageStyle:block','|','toggleImageCaption','imageTextAlternative','|','resizeImage'],
@@ -253,18 +320,77 @@ const ckConfig = {
   table: { contentToolbar: ['tableColumn','tableRow','mergeTableCells'] }
 };
 
-// Inicializar un CKEditor por sección
+// ── Editores de secciones fijas ───────────────────────────────────────────
 const editores = {};
 <?php foreach ($secciones as $sec): ?>
 ClassicEditor.create(document.getElementById('editor_<?= $sec['key'] ?>'), ckConfig)
   .then(e => { editores['<?= $sec['key'] ?>'] = e; }).catch(console.error);
 <?php endforeach; ?>
 
-// Sincronizar CKEditors → hidden inputs antes de enviar
+<?php if ($admiteSeccionesExtra): ?>
+// ── Secciones personalizadas ──────────────────────────────────────────────
+let extraCount = 0;
+const extraEditores = {}; // idx → CKEditorInstance
+
+function agregarSeccion() {
+  const idx       = extraCount++;
+  const container = document.getElementById('extraSecciones');
+  const wrapper   = document.createElement('div');
+  wrapper.className = 'col-12';
+  wrapper.id        = 'extraWrapper_' + idx;
+  wrapper.innerHTML =
+    '<div class="seccion-extra">' +
+      '<div class="d-flex align-items-center gap-2 mb-2">' +
+        '<input type="text" class="form-control form-control-sm fw-semibold" ' +
+               'id="extraTitulo_' + idx + '" placeholder="Título de la sección personalizada..." ' +
+               'style="max-width:380px">' +
+        '<button type="button" class="btn btn-outline-danger btn-sm" onclick="quitarSeccion(' + idx + ')">' +
+          '<i class="bi bi-trash"></i> Quitar' +
+        '</button>' +
+      '</div>' +
+      '<div class="seccion-ayuda">Escribe el contenido libre para esta sección adicional.</div>' +
+      '<div id="extraEditor_' + idx + '"></div>' +
+    '</div>';
+  container.appendChild(wrapper);
+
+  ClassicEditor.create(document.getElementById('extraEditor_' + idx), ckConfig)
+    .then(e => { extraEditores[idx] = e; })
+    .catch(console.error);
+
+  // Scroll suave hacia la nueva sección
+  setTimeout(() => wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+}
+
+function quitarSeccion(idx) {
+  const el = document.getElementById('extraWrapper_' + idx);
+  if (el) el.remove();
+  if (extraEditores[idx]) {
+    extraEditores[idx].destroy();
+    delete extraEditores[idx];
+  }
+}
+<?php endif; ?>
+
+// ── Sincronizar todo antes de enviar ─────────────────────────────────────
 document.getElementById('formDocumento').addEventListener('submit', function() {
+  // Secciones fijas
   <?php foreach ($secciones as $sec): ?>
-  document.getElementById('h_<?= $sec['key'] ?>').value = editores['<?= $sec['key'] ?>']
-    ? editores['<?= $sec['key'] ?>'].getData() : '';
+  document.getElementById('h_<?= $sec['key'] ?>').value =
+    editores['<?= $sec['key'] ?>'] ? editores['<?= $sec['key'] ?>'].getData() : '';
   <?php endforeach; ?>
+
+<?php if ($admiteSeccionesExtra): ?>
+  // Secciones personalizadas → JSON
+  const extras = [];
+  document.querySelectorAll('[id^="extraWrapper_"]').forEach(function(wrapper) {
+    const idx      = wrapper.id.replace('extraWrapper_', '');
+    const titulo   = (document.getElementById('extraTitulo_'  + idx)?.value ?? '').trim();
+    const contenido = extraEditores[idx] ? extraEditores[idx].getData() : '';
+    if (titulo || contenido.trim()) {
+      extras.push({ titulo: titulo, contenido: contenido });
+    }
+  });
+  document.getElementById('h_it_secciones_extra').value = JSON.stringify(extras);
+<?php endif; ?>
 });
 </script>
