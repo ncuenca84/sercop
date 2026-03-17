@@ -414,6 +414,8 @@ class DocumentoService
                 <div class="seccion-body">{{ap.conformidad}}</div>
             </div>
 
+            {{it.secciones_extra}}
+
             <div class="seccion">
                 <div class="seccion-body">
                     En fe de lo cual, las partes suscriben la presente Acta de Entrega Parcial
@@ -493,6 +495,8 @@ class DocumentoService
                 <div class="seccion-titulo">4. Conformidad Definitiva</div>
                 <div class="seccion-body">{{ad.conformidad}}</div>
             </div>
+
+            {{it.secciones_extra}}
 
             <div class="firma-section">
                 <div class="firma-box">
@@ -629,6 +633,8 @@ class DocumentoService
                 <div class="seccion-body">{{gt.cobertura}}</div>
             </div>
 
+            {{it.secciones_extra}}
+
             <div class="firma-section">
                 <div class="firma-box">
                     <div class="firma-linea">
@@ -711,6 +717,8 @@ class DocumentoService
                 <div class="seccion-titulo">4. Petición Formal</div>
                 <div class="seccion-body">{{sp.solicitud}}</div>
             </div>
+
+            {{it.secciones_extra}}
 
             <div class="firma-section">
                 <div class="firma-box">

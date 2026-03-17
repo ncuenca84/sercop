@@ -58,7 +58,7 @@ $secciones             = $seccionesPorTipo[$tipo] ?? [
     ['key' => 'metodologia_trabajo',       'label' => 'Metodología de Trabajo',   'icono' => 'bi-card-text', 'ayuda' => ''],
     ['key' => 'doc_observaciones',         'label' => 'Observaciones',            'icono' => 'bi-card-text', 'ayuda' => ''],
 ];
-$admiteSeccionesExtra  = ($tipo === 'informe_tecnico');
+$admiteSeccionesExtra  = true;
 
 // ─── Variables comunes del proceso ─────────────────────────────────────────
 $monto    = number_format((float)($proceso['monto_total'] ?? 0), 2);
@@ -420,9 +420,7 @@ if ($tipo === 'informe_tecnico') {
         <p><i class="bi bi-magic text-primary me-1"></i>Cada sección viene <strong>pre-llenada</strong> con los datos del proceso. Edita según corresponda.</p>
         <p><i class="bi bi-fonts text-secondary me-1"></i>Usa <strong>negrita, cursiva, listas y tablas</strong> en la barra de cada editor.</p>
         <p><i class="bi bi-image text-success me-1"></i>Para imágenes: botón <strong>🖼</strong> en la barra o pega con Ctrl+V.</p>
-        <?php if ($admiteSeccionesExtra): ?>
-        <p><i class="bi bi-plus-circle text-warning me-1"></i>Puedes agregar <strong>secciones adicionales</strong> con el botón naranja al final del formulario.</p>
-        <?php endif; ?>
+        <p><i class="bi bi-plus-circle text-warning me-1"></i>Puedes agregar <strong>secciones adicionales</strong> con el botón al final del formulario.</p>
         <p class="mb-0"><i class="bi bi-folder me-1"></i>Al generar, el documento queda en el <strong>Expediente Digital</strong>.</p>
       </div>
     </div>
