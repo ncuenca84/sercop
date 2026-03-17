@@ -31,6 +31,16 @@ $seccionesPorTipo = [
         ['key' => 'ap_conformidad','label' => '4. Conformidad',           'icono' => 'bi-check-circle',
          'ayuda' => 'Declaración de conformidad parcial y compromisos de las partes.'],
     ],
+    'acta_definitiva' => [
+        ['key' => 'ad_antecedentes','label' => '1. Antecedentes',          'icono' => 'bi-journal-text',
+         'ayuda' => 'Referencia al contrato, proceso, entregas parciales previas y contexto general.'],
+        ['key' => 'ad_verificacion','label' => '2. Verificación de Entregables','icono' => 'bi-clipboard2-check',
+         'ayuda' => 'Verificación técnica de todos los bienes y/o servicios contratados.'],
+        ['key' => 'ad_liquidacion', 'label' => '3. Liquidación de Pendientes','icono' => 'bi-check2-all',
+         'ayuda' => 'Confirmación de que todos los elementos pendientes han sido resueltos.'],
+        ['key' => 'ad_conformidad', 'label' => '4. Conformidad Definitiva', 'icono' => 'bi-patch-check',
+         'ayuda' => 'Declaración final de conformidad total y cierre del contrato.'],
+    ],
 ];
 
 $secciones             = $seccionesPorTipo[$tipo] ?? [
@@ -113,6 +123,48 @@ if ($tipo === 'informe_tecnico') {
         . "<p><strong>Alcance de la cobertura:</strong> La garantía cubre defectos de fabricación, fallas de "
         . "funcionamiento y problemas técnicos no atribuibles al uso indebido, modificaciones no autorizadas "
         . "o fuerza mayor.</p>";
+
+} elseif ($tipo === 'acta_definitiva') {
+    $sugerencias['ad_antecedentes'] =
+        "<p>En la ciudad de <strong>{$inst}</strong>, en el marco del proceso de contratación "
+        . "<strong>{$numero}</strong>, cuyo objeto es <strong>{$objeto}</strong>, celebrado entre "
+        . "<strong>{$inst}</strong> en calidad de contratante, y <strong>{$prov}</strong> en calidad "
+        . "de proveedor; con un monto de <strong>\${$monto}</strong> más IVA y un plazo contractual "
+        . "de <strong>{$plazo} días calendario</strong> (del {$fi} al {$ff}), las partes comparecen "
+        . "a suscribir la presente Acta de Entrega-Recepción Definitiva, en virtud de haberse "
+        . "completado la totalidad de las obligaciones contractuales.</p>";
+
+    $specs = strip_tags($proceso['especificaciones_tecnicas'] ?? '');
+    $sugerencias['ad_verificacion'] = $specs
+        ? "<p>Se ha realizado la verificación técnica de los bienes y/o servicios entregados, "
+          . "comprobándose el cumplimiento de las siguientes especificaciones:</p>"
+          . "<ul><li>" . nl2br(htmlspecialchars(trim($specs))) . "</li></ul>"
+          . "<p>Los entregables han sido recibidos a entera satisfacción, cumpliendo con los "
+          . "estándares de calidad y las condiciones pactadas en el contrato.</p>"
+        : "<p>Se ha procedido a verificar la totalidad de los bienes y/o servicios objeto del "
+          . "contrato, comprobando que cumplen con las especificaciones técnicas requeridas y "
+          . "que han sido entregados en las condiciones acordadas.</p>"
+          . "<ul><li>Entregable 1: descripción y estado de verificación.</li>"
+          . "<li>Entregable 2: descripción y estado de verificación.</li></ul>";
+
+    $sugerencias['ad_liquidacion'] =
+        "<p>Las partes declaran que a la fecha de suscripción de la presente acta, la totalidad "
+        . "de los bienes y/o servicios contratados han sido entregados y recibidos a conformidad, "
+        . "sin que existan pendientes, observaciones o elementos por resolver.</p>"
+        . "<p>Quedan liquidadas y satisfechas todas las obligaciones contractuales derivadas del "
+        . "proceso <strong>{$numero}</strong>, y el proveedor <strong>{$prov}</strong> ha cumplido "
+        . "íntegramente con el objeto del contrato dentro del plazo establecido.</p>";
+
+    $sugerencias['ad_conformidad'] =
+        "<p>En fe de lo expuesto, las partes comparecientes declaran su <strong>conformidad total "
+        . "y definitiva</strong> con los bienes y/o servicios recibidos, los cuales cumplen en su "
+        . "integridad con las especificaciones técnicas, condiciones contractuales y normativa "
+        . "vigente establecida en la LOSNCP y su Reglamento.</p>"
+        . "<p>La presente acta habilita al proveedor <strong>{$prov}</strong> para proceder con la "
+        . "solicitud de pago final correspondiente, y da inicio al período de vigencia de la "
+        . "garantía técnica pactada en el contrato.</p>"
+        . "<p>En fe de lo cual, las partes suscriben la presente Acta de Entrega-Recepción "
+        . "Definitiva en dos ejemplares de igual valor y efecto legal.</p>";
 
 } elseif ($tipo === 'acta_parcial') {
     $sugerencias['ap_objeto'] =

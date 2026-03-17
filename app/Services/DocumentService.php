@@ -14,14 +14,13 @@ class DocumentoService
         $vars = self::buildVars($proceso, $tenantId, $logoUrl);
 
         switch ($tipo) {
-            case 'informe_tecnico':    return self::renderizar(self::tplInformeTecnico(),          $vars, $proceso);
-            case 'garantia_tecnica':   return self::renderizar(self::tplGarantiaTecnica(),         $vars, $proceso);
-            case 'acta_parcial':       return self::renderizar(self::tplActaParcial(),             $vars, $proceso);
-            case 'acta_provisional':   return self::renderizar(self::tplActaEntrega('Provisional'),$vars, $proceso);
-            case 'acta_definitiva':    return self::renderizar(self::tplActaEntrega('Definitiva'), $vars, $proceso);
-            case 'solicitud_pago':     return self::renderizar(self::tplSolicitudPago(),           $vars, $proceso);
-            case 'informe_conformidad':return self::renderizar(self::tplInformeConformidad(),      $vars, $proceso);
-            default:                   return self::renderizar(self::tplInformeTecnico(),          $vars, $proceso);
+            case 'informe_tecnico':    return self::renderizar(self::tplInformeTecnico(),  $vars, $proceso);
+            case 'garantia_tecnica':   return self::renderizar(self::tplGarantiaTecnica(), $vars, $proceso);
+            case 'acta_parcial':       return self::renderizar(self::tplActaParcial(),     $vars, $proceso);
+            case 'acta_definitiva':    return self::renderizar(self::tplActaDefinitiva(),  $vars, $proceso);
+            case 'solicitud_pago':     return self::renderizar(self::tplSolicitudPago(),   $vars, $proceso);
+            case 'informe_conformidad':return self::renderizar(self::tplInformeConformidad(),$vars, $proceso);
+            default:                   return self::renderizar(self::tplInformeTecnico(),  $vars, $proceso);
         }
     }
 
@@ -114,6 +113,11 @@ class DocumentoService
             '{{ap.detalle}}'             => self::htmlSeguro($proceso['ap_detalle']     ?? ''),
             '{{ap.pendientes}}'          => self::htmlSeguro($proceso['ap_pendientes']  ?? ''),
             '{{ap.conformidad}}'         => self::htmlSeguro($proceso['ap_conformidad'] ?? ''),
+            // Secciones Acta de Entrega Definitiva
+            '{{ad.antecedentes}}'        => self::htmlSeguro($proceso['ad_antecedentes'] ?? ''),
+            '{{ad.verificacion}}'        => self::htmlSeguro($proceso['ad_verificacion'] ?? ''),
+            '{{ad.liquidacion}}'         => self::htmlSeguro($proceso['ad_liquidacion']  ?? ''),
+            '{{ad.conformidad}}'         => self::htmlSeguro($proceso['ad_conformidad']  ?? ''),
             // URLs (inyectadas por el controller)
             '{{anio}}'                    => date('Y'),
         ];
@@ -432,7 +436,80 @@ class DocumentoService
         </div></body></html>';
     }
 
-    // ── Acta de Entrega (Provisional / Definitiva) ────────────────────────
+    // ── Acta de Entrega Definitiva ────────────────────────────────────────
+    private static function tplActaDefinitiva(): string
+    {
+        return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+        <title>Acta de Entrega Definitiva — {{proceso.numero}}</title>'
+        . self::css() . '</head><body>'
+        . self::btnBar('Acta de Entrega-Recepción Definitiva')
+        . '<div class="page">
+            <div class="doc-header">
+                <div class="doc-header-left">{{logo_html}}</div>
+                <div class="doc-header-right">
+                    <div class="doc-title">Acta de Entrega-Recepción Definitiva</div>
+                    <div class="doc-numero">N° {{doc.numero}} &nbsp;|&nbsp; {{doc.lugar}}, {{doc.fecha}}</div>
+                </div>
+            </div>
+
+            <div class="doc-meta"><table>
+                <tr><td>Proceso:</td><td>{{proceso.numero}}</td></tr>
+                <tr><td>Objeto:</td><td>{{proceso.objeto}}</td></tr>
+                <tr><td>Contratante:</td><td>{{institucion.nombre}} — RUC: {{institucion.ruc}}</td></tr>
+                <tr><td>Administrador:</td><td>{{institucion.administrador}}, {{institucion.cargo_admin}}</td></tr>
+                <tr><td>Proveedor:</td><td>{{proveedor.razon_social}} — RUC: {{proveedor.ruc}}</td></tr>
+                <tr><td>Representante:</td><td>{{proveedor.representante}}</td></tr>
+                <tr><td>Monto Total:</td><td>{{proceso.monto}}</td></tr>
+                <tr><td>Plazo Contractual:</td><td>{{proceso.plazo}}</td></tr>
+                <tr><td>Fecha Inicio:</td><td>{{proceso.fecha_inicio}}</td></tr>
+                <tr><td>Fecha Fin:</td><td>{{proceso.fecha_fin}}</td></tr>
+            </table></div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">1. Antecedentes</div>
+                <div class="seccion-body">{{ad.antecedentes}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">2. Verificación de Entregables</div>
+                <div class="seccion-body">{{ad.verificacion}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">Entregables del Contrato</div>
+                {{entregables_tabla}}
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">3. Liquidación de Pendientes</div>
+                <div class="seccion-body">{{ad.liquidacion}}</div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">4. Conformidad Definitiva</div>
+                <div class="seccion-body">{{ad.conformidad}}</div>
+            </div>
+
+            <div class="firma-section">
+                <div class="firma-box">
+                    <div class="firma-linea">
+                        <div class="firma-nombre">{{proveedor.representante}}</div>
+                        <div class="firma-cargo">Representante Legal<br>{{proveedor.razon_social}}<br>RUC: {{proveedor.ruc}}</div>
+                    </div>
+                </div>
+                <div class="firma-box">
+                    <div class="firma-linea">
+                        <div class="firma-nombre">{{institucion.administrador}}</div>
+                        <div class="firma-cargo">{{institucion.cargo_admin}}<br>{{institucion.nombre}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-doc">Documento generado por sistema Brixs Contratación — {{doc.fecha}}</div>
+        </div></body></html>';
+    }
+
+    // ── Acta de Entrega (legacy, mantenido por compatibilidad) ────────────
     private static function tplActaEntrega(string $tipo): string
     {
         return '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">

@@ -13,7 +13,7 @@
   $tiposStd = [
     'informe_tecnico'    => ['📄','Informe Técnico de Entrega','bg-info'],
     'garantia_tecnica'   => ['🛡️','Certificado de Garantía Técnica','bg-warning'],
-    'acta_provisional'   => ['📝','Acta Entrega Provisional','bg-secondary'],
+    'acta_parcial'       => ['📋','Acta de Entrega Parcial','bg-secondary'],
     'acta_definitiva'    => ['✅','Acta Entrega Definitiva','bg-success'],
     'solicitud_pago'     => ['💰','Solicitud de Pago','bg-success'],
     'informe_conformidad'=> ['✔️','Informe de Conformidad','bg-dark'],

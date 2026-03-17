@@ -702,7 +702,6 @@ class ProcesosController extends BaseController
             'informe_tecnico'    => 'Informe Técnico de Entrega',
             'garantia_tecnica'   => 'Certificado de Garantía Técnica',
             'acta_parcial'       => 'Acta de Entrega Parcial',
-            'acta_provisional'   => 'Acta de Entrega Provisional',
             'acta_definitiva'    => 'Acta de Entrega Definitiva',
             'solicitud_pago'     => 'Solicitud de Pago',
             'informe_conformidad'=> 'Informe de Conformidad',
@@ -736,6 +735,8 @@ class ProcesosController extends BaseController
             'gt_objeto','gt_vigencia','gt_cobertura',
             // Secciones Acta de Entrega Parcial
             'ap_objeto','ap_detalle','ap_pendientes','ap_conformidad',
+            // Secciones Acta de Entrega Definitiva
+            'ad_antecedentes','ad_verificacion','ad_liquidacion','ad_conformidad',
         ];
         foreach ($override as $campo) {
             if (isset($_POST[$campo]) && $_POST[$campo] !== '') {
@@ -850,7 +851,6 @@ class ProcesosController extends BaseController
             'informe_tecnico'    => 'InformeTecnico',
             'garantia_tecnica'   => 'Garantia',
             'acta_parcial'       => 'ActaParcial',
-            'acta_provisional'   => 'ActaProvisional',
             'acta_definitiva'    => 'ActaDefinitiva',
             'solicitud_pago'     => 'SolicitudPago',
             'informe_conformidad'=> 'InformeConformidad',
