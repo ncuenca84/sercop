@@ -790,10 +790,12 @@ class ProcesosController extends BaseController
         exit;
     }
 
-    // ── Generar secciones del documento con IA (endpoint AJAX) ───────────
+    // ── Generar UNA sección del documento con IA (endpoint AJAX) ────────
+    // Recibe POST[seccion] = especificaciones_tecnicas | metodologia_trabajo | observaciones
+    // Genera solo esa sección (~800 tokens, < 25s) para no superar max_execution_time=30
+    // El frontend hace 3 llamadas secuenciales, una por sección.
     public function generarDocumentoConIa(string $id): void
     {
-        set_time_limit(120); // La llamada a la IA puede tardar más de 30s (límite del php.ini)
         header('Content-Type: application/json; charset=UTF-8');
         try {
             $proceso = Proceso::conInstitucion((int)$id);
@@ -803,11 +805,18 @@ class ProcesosController extends BaseController
             }
 
             $tipo        = trim($_POST['tipo']         ?? 'informe_tecnico');
+            $seccion     = trim($_POST['seccion']      ?? '');
             $promptExtra = trim($_POST['prompt_extra'] ?? '');
 
-            $secciones = IaService::generarSeccionesDocumento($tipo, $proceso, $promptExtra);
+            $seccionesValidas = ['especificaciones_tecnicas', 'metodologia_trabajo', 'observaciones'];
+            if (!in_array($seccion, $seccionesValidas, true)) {
+                echo json_encode(['ok' => false, 'error' => 'Sección no válida: ' . $seccion]);
+                exit;
+            }
 
-            echo json_encode(['ok' => true, 'secciones' => $secciones], JSON_UNESCAPED_UNICODE);
+            $html = IaService::generarSeccionDocumento($tipo, $seccion, $proceso, $promptExtra);
+
+            echo json_encode(['ok' => true, 'seccion' => $seccion, 'html' => $html], JSON_UNESCAPED_UNICODE);
         } catch (\Throwable $e) {
             echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
         }

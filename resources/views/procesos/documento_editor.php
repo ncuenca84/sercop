@@ -57,7 +57,7 @@
       <i class="bi bi-stars me-1"></i>Generar contenido
     </button>
     <button type="button" id="btnGenerarIaLoading" class="btn btn-primary d-none" disabled>
-      <span class="spinner-border spinner-border-sm me-1"></span>Generando…
+      <span class="spinner-border spinner-border-sm me-1"></span><span id="iaProgreso">Sección 1/3…</span>
     </button>
 
     <div id="iaError" class="alert alert-danger mt-2 d-none small"></div>
@@ -272,10 +272,13 @@ function setModo(modo) {
   }
 }
 
-// ── Llamada AJAX para generar con IA ─────────────────────────────────────
-function generarConIa() {
+// ── Llamada AJAX para generar con IA (3 llamadas secuenciales, 1 sección c/u) ──
+// Cada llamada genera ~800 tokens y finaliza en < 25s, evitando el límite
+// max_execution_time=30 del servidor cPanel.
+async function generarConIa() {
   const btn        = document.getElementById('btnGenerarIa');
   const btnLoading = document.getElementById('btnGenerarIaLoading');
+  const progreso   = document.getElementById('iaProgreso');
   const errDiv     = document.getElementById('iaError');
   const okDiv      = document.getElementById('iaOk');
   const promptExtra = document.getElementById('iaPromptExtra').value.trim();
@@ -288,55 +291,62 @@ function generarConIa() {
   const csrfToken = document.querySelector('input[name="_csrf"]')?.value ?? '';
   const tipo      = document.querySelector('input[name="tipo"]').value;
   const procesoId = <?= (int)$proceso['id'] ?>;
+  const url       = `/procesos/${procesoId}/documento/generar-ia`;
 
-  const body = new URLSearchParams({
-    _csrf:        csrfToken,
-    tipo:         tipo,
-    prompt_extra: promptExtra,
-  });
+  const secciones = [
+    { key: 'especificaciones_tecnicas', ck: () => ckEspec, label: 'Especificaciones (1/3)' },
+    { key: 'metodologia_trabajo',       ck: () => ckMetod, label: 'Metodología (2/3)' },
+    { key: 'observaciones',             ck: () => ckObs,   label: 'Observaciones (3/3)' },
+  ];
 
-  // Timeout de 90s en el browser para no quedar colgado si PHP falla
-  const controller = new AbortController();
-  const timeoutId  = setTimeout(() => controller.abort(), 90000);
+  try {
+    for (const sec of secciones) {
+      progreso.textContent = sec.label + '…';
 
-  fetch(`/procesos/${procesoId}/documento/generar-ia`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
-    signal: controller.signal,
-  })
-  .then(r => {
-    clearTimeout(timeoutId);
-    if (!r.ok) throw new Error('El servidor respondió con código ' + r.status);
-    return r.json();
-  })
-  .then(data => {
-    btn.classList.remove('d-none');
-    btnLoading.classList.add('d-none');
+      const controller = new AbortController();
+      const timeoutId  = setTimeout(() => controller.abort(), 28000); // 28s < 30s PHP limit
 
-    if (!data.ok) {
-      errDiv.textContent = 'Error: ' + (data.error ?? 'respuesta inesperada de la IA');
-      errDiv.classList.remove('d-none');
-      return;
+      let data;
+      try {
+        const body = new URLSearchParams({
+          _csrf:        csrfToken,
+          tipo:         tipo,
+          seccion:      sec.key,
+          prompt_extra: promptExtra,
+        });
+
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (!r.ok) throw new Error('El servidor respondió con código ' + r.status);
+        data = await r.json();
+      } catch (fetchErr) {
+        clearTimeout(timeoutId);
+        throw fetchErr.name === 'AbortError'
+          ? new Error('La IA tardó demasiado en la sección "' + sec.label + '". Intenta de nuevo.')
+          : fetchErr;
+      }
+
+      if (!data.ok) throw new Error(data.error ?? 'respuesta inesperada de la IA');
+
+      const editor = sec.ck();
+      if (editor && data.html) editor.setData(data.html);
     }
-
-    const s = data.secciones;
-    if (ckEspec && s.especificaciones_tecnicas) ckEspec.setData(s.especificaciones_tecnicas);
-    if (ckMetod && s.metodologia_trabajo)       ckMetod.setData(s.metodologia_trabajo);
-    if (ckObs   && s.observaciones)             ckObs.setData(s.observaciones);
 
     okDiv.classList.remove('d-none');
     setModo('manual');
-  })
-  .catch(err => {
-    clearTimeout(timeoutId);
+
+  } catch (err) {
+    errDiv.textContent = 'Error: ' + err.message;
+    errDiv.classList.remove('d-none');
+  } finally {
     btn.classList.remove('d-none');
     btnLoading.classList.add('d-none');
-    const msg = err.name === 'AbortError'
-      ? 'La IA tardó demasiado (>90s). Intenta de nuevo.'
-      : 'Error: ' + err.message;
-    errDiv.textContent = msg;
-    errDiv.classList.remove('d-none');
-  });
+  }
 }
 </script>
