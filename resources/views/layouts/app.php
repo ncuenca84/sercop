@@ -285,7 +285,7 @@ border-radius:4px;
 <nav id="sidebar">
 
 <div class="brand">
-<h5><i class="bi bi-bank me-2"></i>ContratosPúblicos</h5>
+<h5><i class="bi bi-bank me-2"></i>Contratación Pública EC</h5>
 <small><?= e($_SESSION['tenant_nombre'] ?? '') ?></small>
 </div>
 

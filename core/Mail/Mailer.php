@@ -30,7 +30,7 @@ class Mailer
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $headers .= "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM . ">\r\n";
         $headers .= "Reply-To: " . MAIL_FROM . "\r\n";
-        $headers .= "X-Mailer: ContratosPúblicosEC/1.0\r\n";
+        $headers .= "X-Mailer: ContratacionPublicaEC/1.0\r\n";
         return mail($to, '=?UTF-8?B?' . base64_encode($subject) . '?=', $html, $headers);
     }
 

@@ -250,9 +250,7 @@ if ($tipo === 'informe_tecnico') {
         . "contractuales, solicito comedidamente se sirva gestionar y autorizar el pago "
         . "correspondiente a la brevedad posible, conforme a la forma de pago establecida en "
         . "el contrato y a lo dispuesto en la normativa vigente.</p>"
-        . "<p>Agradezco la atención brindada a la presente solicitud.</p>"
-        . "<p>Atentamente,<br><strong>{$rep}</strong><br>Representante Legal<br>"
-        . "<strong>{$prov}</strong> — RUC: {$ruc}</p>";
+        . "<p>Agradezco la atención brindada a la presente solicitud.</p>";
 
 } else {
     $sugerencias['especificaciones_tecnicas'] = $proceso['especificaciones_tecnicas'] ?? '';

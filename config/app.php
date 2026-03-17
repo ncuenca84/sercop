@@ -20,7 +20,7 @@ if (file_exists($envFile)) {
 }
 
 // ── Constantes de la aplicación ────────────────────────────────────────────
-define('APP_NAME',       $_ENV['APP_NAME']       ?? 'ContratosPúblicos EC');
+define('APP_NAME',       $_ENV['APP_NAME']       ?? 'Contratación Pública EC');
 define('APP_URL',        rtrim($_ENV['APP_URL']  ?? 'http://localhost', '/'));
 define('APP_ENV',        $_ENV['APP_ENV']        ?? 'production');
 define('APP_DEBUG',      filter_var($_ENV['APP_DEBUG'] ?? 'false', FILTER_VALIDATE_BOOLEAN));
