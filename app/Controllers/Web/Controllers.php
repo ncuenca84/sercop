@@ -592,11 +592,15 @@ class ProcesosController extends BaseController
             if (isset($_POST[$f])) $update[$f] = $_POST[$f] === '' ? null : $_POST[$f];
         }
 
-        // Títulos personalizables de secciones (JSON)
+        // Títulos personalizables de secciones (JSON) — se guarda por separado con try/catch
+        // porque requiere ejecutar la migración alter_secciones_titulos.sql en producción.
+        $titulosJson = null;
         if (!empty($_POST['secciones_titulos']) && is_array($_POST['secciones_titulos'])) {
             $titulos = array_map('trim', $_POST['secciones_titulos']);
             $titulos = array_filter($titulos, fn($v) => $v !== '');
-            $update['secciones_titulos'] = !empty($titulos) ? json_encode($titulos, JSON_UNESCAPED_UNICODE) : null;
+            if (!empty($titulos)) {
+                $titulosJson = json_encode($titulos, JSON_UNESCAPED_UNICODE);
+            }
         }
 
         // Toggles on/off: el checkbox envía "1" si activo, sino viene el hidden "0"
@@ -614,6 +618,15 @@ class ProcesosController extends BaseController
 
         Proceso::update((int)$id, $update);
         DB::audit('UPDATE', 'procesos', (int)$id, $proceso, $update);
+
+        // Guardar títulos personalizados (columna opcional — requiere migración)
+        if ($titulosJson !== null) {
+            try {
+                Proceso::update((int)$id, ['secciones_titulos' => $titulosJson]);
+            } catch (\Throwable $e) {
+                // La columna secciones_titulos aún no existe: ignorar sin bloquear
+            }
+        }
 
         // Guardar campos extra dinámicos
         $nombres    = $_POST['campo_nombre']    ?? [];
