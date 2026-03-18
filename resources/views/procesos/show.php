@@ -658,7 +658,7 @@
             <form method="POST" action="/entregables/<?= $e['id'] ?>/estado" class="d-flex gap-1">
               <?= csrf_field() ?>
               <select name="estado" class="form-select form-select-sm" style="width:120px">
-                <?php foreach(['pendiente','en_progreso','entregado','aprobado','observado'] as $est): ?>
+                <?php foreach(['pendiente','en_progreso','entregado','aprobado','observado','cancelado'] as $est): ?>
                 <option value="<?= $est ?>" <?= $e['estado']===$est?'selected':'' ?>><?= ucfirst($est) ?></option>
                 <?php endforeach; ?>
               </select>
@@ -684,7 +684,7 @@
       <?= csrf_field() ?>
       <div class="col-md-3">
         <select name="categoria" class="form-select form-select-sm">
-          <?php foreach(['tdr'=>'00 TDR / Especificaciones Técnicas','orden_compra'=>'01 Orden de Compra','proforma'=>'02 Proformas','doc_proveedor'=>'03 Docs. Proveedor','garantia'=>'04 Garantía Técnica','informe_tecnico'=>'05 Informes Técnicos','acta_entrega'=>'06 Actas de Entrega','factura'=>'07 Facturación','solicitud_pago'=>'08 Solicitud Pago','comunicacion'=>'09 Comunicaciones','imagenes_f2'=>'10 Imágenes del Proceso','otro'=>'11 Otros'] as $k=>$v): ?>
+          <?php foreach(['informe_necesidad'=>'00 Informe de Necesidad','tdr'=>'01 TDR / Especificaciones Técnicas','orden_compra'=>'02 Orden de Compra','proforma'=>'03 Proformas','doc_proveedor'=>'04 Docs. Proveedor','garantia'=>'05 Garantía Técnica','informe_tecnico'=>'06 Informes Técnicos','acta_entrega'=>'07 Actas de Entrega','factura'=>'08 Facturación','solicitud_pago'=>'09 Solicitud Pago','comunicacion'=>'10 Comunicaciones','imagenes_f2'=>'11 Imágenes del Proceso','otro'=>'12 Otros'] as $k=>$v): ?>
           <option value="<?= $k ?>"><?= $v ?></option>
           <?php endforeach; ?>
         </select>
@@ -696,18 +696,19 @@
     <div class="row g-2">
       <?php
       $categorias = [
-        'tdr'           => ['00','TDR / Especif. Técnicas', 'file-earmark-ruled',   'primary'],
-        'orden_compra'  => ['01','Orden de Compra',         'file-earmark-pdf',     'danger'],
-        'proforma'      => ['02','Proformas',               'file-earmark-text',    'info'],
-        'doc_proveedor' => ['03','Docs. Proveedor',         'person-badge',         'secondary'],
-        'garantia'      => ['04','Garantía Técnica',        'shield-check',         'warning'],
-        'informe_tecnico'=> ['05','Informes Técnicos',      'file-earmark-richtext','success'],
-        'acta_entrega'  => ['06','Actas de Entrega',        'pen',                  'success'],
-        'factura'       => ['07','Facturación',             'receipt',              'success'],
-        'solicitud_pago'=> ['08','Solicitud Pago',          'cash-coin',            'success'],
-        'comunicacion'  => ['09','Comunicaciones',          'envelope',             'secondary'],
-        'imagenes_f2'   => ['10','Imágenes del Proceso',    'images',               'info'],
-        'otro'          => ['11','Otros Documentos',        'folder2',              'secondary'],
+        'informe_necesidad'=> ['00','Informe de Necesidad',  'file-earmark-check',   'primary'],
+        'tdr'           => ['01','TDR / Especif. Técnicas', 'file-earmark-ruled',   'primary'],
+        'orden_compra'  => ['02','Orden de Compra',         'file-earmark-pdf',     'danger'],
+        'proforma'      => ['03','Proformas',               'file-earmark-text',    'info'],
+        'doc_proveedor' => ['04','Docs. Proveedor',         'person-badge',         'secondary'],
+        'garantia'      => ['05','Garantía Técnica',        'shield-check',         'warning'],
+        'informe_tecnico'=> ['06','Informes Técnicos',      'file-earmark-richtext','success'],
+        'acta_entrega'  => ['07','Actas de Entrega',        'pen',                  'success'],
+        'factura'       => ['08','Facturación',             'receipt',              'success'],
+        'solicitud_pago'=> ['09','Solicitud Pago',          'cash-coin',            'success'],
+        'comunicacion'  => ['10','Comunicaciones',          'envelope',             'secondary'],
+        'imagenes_f2'   => ['11','Imágenes del Proceso',    'images',               'info'],
+        'otro'          => ['12','Otros Documentos',        'folder2',              'secondary'],
       ];
       foreach($categorias as $cat=>[$num,$label,$icon,$color]):
         $docs = $documentos[$cat] ?? [];

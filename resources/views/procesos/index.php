@@ -20,7 +20,7 @@
       <div class="col-md-2">
         <select name="estado" class="form-select form-select-sm">
           <option value="">Todos los estados</option>
-          <?php foreach(['adjudicado','en_ejecucion','entregado_provisional','entregado_definitivo','facturado','pagado','cerrado'] as $est): ?>
+          <?php foreach(['en_proceso','adjudicado','en_ejecucion','entregado_provisional','entregado_definitivo','facturado','pagado','cerrado','cancelado'] as $est): ?>
           <option value="<?= $est ?>" <?= ($filtros['estado']??'')===$est?'selected':'' ?>><?= ucwords(str_replace('_',' ',$est)) ?></option>
           <?php endforeach; ?>
         </select>

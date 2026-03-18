@@ -503,7 +503,6 @@ class ProformaService
     <div class="campo"><strong>RUC:</strong> {{institucion.ruc}}</div>
     <div class="campo"><strong>Código NIC:</strong> {{proceso.numero}}</div>
     <div class="campo"><strong>Funcionario Encargado:</strong> {{institucion.administrador}}</div>
-    <div class="campo"><strong>Cargo:</strong> {{institucion.cargo_admin}}</div>
     <div class="campo"><strong>Correo:</strong> {{institucion.email_admin}}</div>
     <div class="campo"><strong>Objeto de compra:</strong> {{proceso.objeto}}</div>
     <div class="campo"><strong>Dirección:</strong> {{institucion.direccion}}</div>
