@@ -668,6 +668,16 @@ class ProcesosController extends BaseController
         $antes = Proceso::find((int)$id);
         $data  = $this->allInput();
         unset($data['_csrf'], $data['_method']);
+
+        // Columnas numéricas: convertir '' a null para evitar error MySQL DECIMAL
+        $numericCols = ['monto_total','monto_con_iva','monto_anticipo','penalidad_por_dia',
+                        'plazo_dias','plazo_garantia_dias','porcentaje_avance'];
+        foreach ($numericCols as $col) {
+            if (array_key_exists($col, $data) && $data[$col] === '') {
+                $data[$col] = null;
+            }
+        }
+
         Proceso::update((int)$id, $data);
         DB::audit('UPDATE', 'procesos', (int)$id, $antes, $data);
         View::flash('success', 'Proceso actualizado.');
