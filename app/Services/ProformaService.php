@@ -240,6 +240,14 @@ class ProformaService
             <td style='text-align:right'>$" . number_format($monto, 2) . "</td>
             <td style='text-align:right;font-weight:bold'>$" . number_format($monto, 2) . "</td>
         </tr>
+        <tr style='background:#f0f0f0;font-weight:bold'>
+            <td colspan='6' style='text-align:right;padding-right:8px'>SUBTOTAL:</td>
+            <td style='text-align:right'>$" . number_format($monto, 2) . "</td>
+        </tr>
+        <tr style='background:#f0f0f0;font-weight:bold'>
+            <td colspan='6' style='text-align:right;padding-right:8px'>IVA 15%:</td>
+            <td style='text-align:right'>$" . number_format($monto * 0.15, 2) . "</td>
+        </tr>
         <tr style='background:#1B4F72;color:#fff;font-weight:bold'>
             <td colspan='6' style='text-align:right;padding-right:8px'>TOTAL:</td>
             <td style='text-align:right'>$" . number_format($monto * 1.15, 2) . "</td>
