@@ -691,6 +691,14 @@ class ProcesosController extends BaseController
             }
         }
 
+        // Columnas booleanas (checkbox): normalizar 'on'/'' a 1/0
+        $boolCols = ['tiene_garantia', 'tiene_anticipo'];
+        foreach ($boolCols as $col) {
+            if (array_key_exists($col, $data)) {
+                $data[$col] = in_array($data[$col], [1, '1', 'on', true], true) ? 1 : 0;
+            }
+        }
+
         Proceso::update((int)$id, $data);
         DB::audit('UPDATE', 'procesos', (int)$id, $antes, $data);
         View::flash('success', 'Proceso actualizado.');
