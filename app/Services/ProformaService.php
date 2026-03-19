@@ -275,7 +275,7 @@ class ProformaService
         $contenido = self::sanitizarHtmlEditor($texto);
 
         // Nota fija: activa por defecto, desactivable por toggle
-        $notaActiva = ($proceso['nota_espec_activa'] ?? '1') !== '0';
+        $notaActiva = (string)($proceso['nota_espec_activa'] ?? '1') !== '0';
         $notaBloque = '';
         if ($notaActiva) {
             $notaTexto = trim($proceso['nota_espec_texto'] ?? '')
@@ -356,7 +356,7 @@ class ProformaService
     private static function seccionDeclaracion(array $proceso): string
     {
         // Si el toggle está explícitamente desactivado, no mostrar
-        if (($proceso['declaracion_activa'] ?? '1') === '0') return '';
+        if ((string)($proceso['declaracion_activa'] ?? '1') === '0') return '';
 
         $texto = trim($proceso['declaracion_cumplimiento'] ?? '');
         if (empty($texto)) {
@@ -372,7 +372,7 @@ class ProformaService
     // ── Sección HTML Nuestro Plus ─────────────────────────────────────────
     private static function seccionPlus(array $proceso): string
     {
-        if (($proceso['plus_activo'] ?? '1') === '0') return '';
+        if ((string)($proceso['plus_activo'] ?? '1') === '0') return '';
 
         $textoDefault = 'Servicio de Antispam Dedicado - Protección Avanzada Contra el Correo No Deseado
 Ofrecemos un sistema antispam dedicado, completamente gratuito durante el periodo de contratación, que garantiza un 99% de efectividad en la detección de spam. Este servicio avanzado incluye cuarentenas configurables, gestión de listas blancas y negras, y un potente sistema AntiSpam/Antivirus que permite establecer políticas personalizadas para filtrar correos por contenido, asunto, remitente y más.

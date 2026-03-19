@@ -398,7 +398,7 @@
 
             <!-- BOX: Nota fija al final de especificaciones -->
             <?php
-            $notaActivada = ($proceso['nota_espec_activa'] ?? '1') !== '0';
+            $notaActivada = (string)($proceso['nota_espec_activa'] ?? '1') !== '0';
             $notaTexto    = $proceso['nota_espec_texto'] ?? 'Todos los servicios serán entregados de manera virtual, adicional es importante tomar en consideración que la recuperación de la información de administraciones anteriores, solo es posible si el proveedor anterior facilita el acceso, caso contrario es imposible y no podremos obtener la información antigua.';
             ?>
             <div class="mt-2 border rounded p-2" style="background:#fffbf0;border-color:#f39c12!important">
@@ -491,7 +491,7 @@
 
           <!-- 7. DECLARACIÓN DE CUMPLIMIENTO -->
           <?php
-          $declActiva = ($proceso['declaracion_activa'] ?? '1') !== '0';
+          $declActiva = (string)($proceso['declaracion_activa'] ?? '1') !== '0';
           $declTexto  = !empty($proceso['declaracion_cumplimiento'])
               ? $proceso['declaracion_cumplimiento']
               : 'Confirmamos que nuestra oferta cumple completamente con todos los términos y condiciones especificados en los términos de referencia (TDR) proporcionados por su institución.';
@@ -543,7 +543,7 @@
 
           <!-- NUESTRO PLUS toggle -->
           <?php
-          $plusActivo = ($proceso['plus_activo'] ?? '1') !== '0';
+          $plusActivo = (string)($proceso['plus_activo'] ?? '1') !== '0';
           $plusTextoDefault = 'Servicio de Antispam Dedicado - Protección Avanzada Contra el Correo No Deseado
 Ofrecemos un sistema antispam dedicado, completamente gratuito durante el periodo de contratación, que garantiza un 99% de efectividad en la detección de spam. Este servicio avanzado incluye cuarentenas configurables, gestión de listas blancas y negras, y un potente sistema AntiSpam/Antivirus que permite establecer políticas personalizadas para filtrar correos por contenido, asunto, remitente y más.
 
