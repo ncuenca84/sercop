@@ -182,8 +182,8 @@ class ProformaService
                     : ($config['vigencia_oferta'] ?? '30 días calendario')
             ),
             // Títulos personalizables de secciones inline en el template
-            '{{titulo.plazo_texto}}'     => self::tituloSec($proceso, 'plazo_texto',     '5. Plazo de Entrega'),
-            '{{titulo.vigencia_oferta}}' => self::tituloSec($proceso, 'vigencia_oferta', '7. Vigencia de la Oferta'),
+            '{{titulo.plazo_texto}}'     => self::tituloSec($proceso, 'plazo_texto',     'Plazo de Entrega'),
+            '{{titulo.vigencia_oferta}}' => self::tituloSec($proceso, 'vigencia_oferta', 'Vigencia de la Oferta'),
             // URL back (inyectado por el controller, no reemplazar aquí)
         ];
     }
@@ -286,7 +286,7 @@ class ProformaService
         }
 
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">' . self::tituloSec($proceso, 'especificaciones_tecnicas', '2. Especificaciones Técnicas') . '</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'especificaciones_tecnicas', 'Especificaciones Técnicas') . '</div>
             <div class="ck-content" style="font-size:9pt;line-height:1.5">'
             . $contenido
             . $notaBloque
@@ -300,7 +300,7 @@ class ProformaService
         if (empty($texto)) return '';
         $contenido = self::sanitizarHtmlEditor($texto);
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">' . self::tituloSec($proceso, 'metodologia_trabajo', '3. Metodología de Trabajo') . '</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'metodologia_trabajo', 'Metodología de Trabajo') . '</div>
             <div class="ck-content" style="font-size:9pt;line-height:1.5">'
             . $contenido .
             '</div></div>';
@@ -333,7 +333,7 @@ class ProformaService
         $texto = trim($proceso['cpc_descripcion'] ?? '');
         if (empty($texto)) return '';
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">' . self::tituloSec($proceso, 'cpc_descripcion', '4. CPC') . '</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'cpc_descripcion', 'CPC — Código y Descripción') . '</div>
             <div style="font-size:9.5pt;line-height:1.5;white-space:pre-wrap">'
             . htmlspecialchars($texto) .
             '</div></div>';
@@ -346,7 +346,7 @@ class ProformaService
         if (empty($texto)) return '';
         $contenido = self::sanitizarHtmlEditor($texto);
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">' . self::tituloSec($proceso, 'forma_pago', '6. Forma y Condiciones de Pago') . '</div>
+            <div class="sec-tit">' . self::tituloSec($proceso, 'forma_pago', 'Forma y Condiciones de Pago') . '</div>
             <div class="ck-content" style="font-size:9.5pt;line-height:1.5">'
             . $contenido .
             '</div></div>';
@@ -363,7 +363,7 @@ class ProformaService
             $texto = 'Confirmamos que nuestra oferta cumple completamente con todos los términos y condiciones especificados en los términos de referencia (TDR) proporcionados por su institución.';
         }
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit">8. Declaraci&oacute;n de Cumplimiento</div>
+            <div class="sec-tit">Declaraci&oacute;n de Cumplimiento</div>
             <div style="font-size:9.5pt;line-height:1.5">'
             . nl2br(htmlspecialchars($texto)) .
             '</div></div>';
@@ -393,7 +393,7 @@ Este servicio proporciona una solución integral para la protección y gestión 
 
         $texto = trim($proceso['plus_texto'] ?? '') ?: $textoDefault;
         return '<div style="margin-bottom:12px">
-            <div class="sec-tit" style="color:#c0392b">&#11088; NUESTRO PLUS</div>
+            <div class="sec-tit">NUESTRO PLUS</div>
             <div style="font-size:9.5pt;line-height:1.6;white-space:pre-line">'
             . htmlspecialchars($texto) .
             '</div></div>';
@@ -541,7 +541,7 @@ Este servicio proporciona una solución integral para la protección y gestión 
   </div>
 
   <!-- 1. PROPUESTA ECONÓMICA -->
-  <div style="margin-bottom:12px"><div class="sec-tit">1. Propuesta Económica</div>
+  <div style="margin-bottom:12px"><div class="sec-tit">Propuesta Económica</div>
     <table><thead><tr>
       <th style="width:4%;text-align:center">N°</th>
       <th style="width:10%">CPC</th>
