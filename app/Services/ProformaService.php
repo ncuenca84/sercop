@@ -40,7 +40,7 @@ class ProformaService
         return array_merge(self::configDefecto(), $config);
     }
 
-    // ── Guardar config del tenant ─────────────────────────────────────────
+    // ── Guardar config del tenant (preserva el mapa de secuenciales) ────────
     public static function saveConfig(int $tenantId, array $nuevaConfig): void
     {
         $tenant = \DB::selectOne("SELECT config FROM tenants WHERE id = ?", [$tenantId]);
@@ -48,6 +48,10 @@ class ProformaService
         if ($tenant && $tenant['config']) {
             $data = json_decode($tenant['config'], true) ?? [];
         }
+        // Preservar campos internos de secuencial que no vienen del formulario
+        $prev = $data['proforma'] ?? [];
+        if (isset($prev['proforma_numeros']))    $nuevaConfig['proforma_numeros']    = $prev['proforma_numeros'];
+        if (isset($prev['proforma_ultimo_seq'])) $nuevaConfig['proforma_ultimo_seq'] = $prev['proforma_ultimo_seq'];
         $data['proforma'] = $nuevaConfig;
         \DB::query(
             "UPDATE tenants SET config = ? WHERE id = ?",
@@ -81,10 +85,62 @@ class ProformaService
         return self::plantillaDefault();
     }
 
+    // ── Asignar/recuperar número de proforma secuencial por proceso ──────────
+    private static function assignProformaNumero(int $procesoId, int $tenantId): string
+    {
+        $tenant  = \DB::selectOne("SELECT config FROM tenants WHERE id = ?", [$tenantId]);
+        $rawData = ($tenant && $tenant['config']) ? (json_decode($tenant['config'], true) ?? []) : [];
+        $pData   = $rawData['proforma'] ?? [];
+
+        $numeros = $pData['proforma_numeros'] ?? [];
+        $pidStr  = (string)$procesoId;
+
+        // Si el proceso ya tiene número asignado, devolverlo
+        if (isset($numeros[$pidStr])) {
+            return $numeros[$pidStr];
+        }
+
+        // Calcular el siguiente número en base a la config base (ej: "2026-353")
+        $anio    = date('Y');
+        $baseStr = $pData['proforma_numero'] ?? ($anio . '-353');
+        $partes  = explode('-', $baseStr, 2);
+        $baseNum = (int)($partes[1] ?? 353);
+
+        // Usar el último secuencial registrado, o calcular desde el máximo existente
+        if (isset($pData['proforma_ultimo_seq'])) {
+            $siguiente = (int)$pData['proforma_ultimo_seq'] + 1;
+        } else {
+            // Primera vez: tomar el máximo ya asignado en el año actual o el base
+            $actuales = [];
+            foreach ($numeros as $num) {
+                $p = explode('-', $num, 2);
+                if (($p[0] ?? '') === $anio) {
+                    $actuales[] = (int)($p[1] ?? 0);
+                }
+            }
+            $siguiente = empty($actuales) ? $baseNum : max($actuales) + 1;
+        }
+
+        $numero = $anio . '-' . str_pad($siguiente, 3, '0', STR_PAD_LEFT);
+
+        // Persistir el número asignado y el último secuencial usado
+        $pData['proforma_numeros'][$pidStr] = $numero;
+        $pData['proforma_ultimo_seq']        = $siguiente;
+        $rawData['proforma'] = $pData;
+        \DB::query(
+            "UPDATE tenants SET config = ? WHERE id = ?",
+            [json_encode($rawData, JSON_UNESCAPED_UNICODE), $tenantId]
+        );
+
+        return $numero;
+    }
+
     // ── Generar HTML final con datos del proceso ──────────────────────────
     public static function generar(array $proceso, int $tenantId, string $logoUrl = ''): string
     {
         $config   = self::getConfig($tenantId);
+        // Sobrescribir el número de proforma con el secuencial real del proceso
+        $config['proforma_numero'] = self::assignProformaNumero((int)$proceso['id'], $tenantId);
         $template = self::getPlantillaHtml($tenantId);
         $vars     = self::buildVars($proceso, $config, $logoUrl);
 
