@@ -461,23 +461,25 @@
           </div>
 
           <!-- 4. PLAZO DE ENTREGA (texto completo) -->
+          <?php $plazoTextoVal = $proceso['plazo_texto'] ?? 'El plazo de la ejecución del servicio es de'; ?>
           <div class="col-12">
             <label class="form-label fw-semibold small">
-              <?= tituloSeccion($titulosSecciones, 'plazo_texto', 'Plazo de Entrega — texto completo') ?>
+              <?= tituloSeccion($titulosSecciones, 'plazo_texto', 'Plazo de Entrega') ?>
               <?php if(!empty($proceso['plazo_texto'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="plazo_texto" id="plazo_texto" rows="2" class="form-control form-control-sm"
-                      placeholder="Ej: El plazo para la ejecución del servicio es de 5 días laborables, contados a partir de la fecha de suscripción de la orden de compra entre las partes."><?= e($proceso['plazo_texto'] ?? '') ?></textarea>
+                      placeholder="El plazo de la ejecución del servicio es de"><?= e($plazoTextoVal) ?></textarea>
           </div>
 
           <!-- 5. FORMA Y CONDICIONES DE PAGO -->
+          <?php $formaPagoVal = $proceso['forma_pago'] ?? 'Contra Entrega.'; ?>
           <div class="col-12">
             <label class="form-label fw-semibold small">
               <?= tituloSeccion($titulosSecciones, 'forma_pago', 'Forma y Condiciones de Pago') ?>
               <?php if(!empty($proceso['forma_pago'])): ?><span class="badge bg-success ms-1">&#10003;</span><?php endif; ?>
             </label>
             <textarea name="forma_pago" id="ck_forma_pago" class="form-control form-control-sm"
-                      placeholder="Se puede extraer del PDF TDR..."><?= $proceso['forma_pago'] ?? '' ?></textarea>
+                      placeholder="Contra Entrega."><?= $formaPagoVal ?></textarea>
           </div>
 
           <!-- 6. VIGENCIA DE LA OFERTA -->
@@ -536,6 +538,71 @@
               </div>
               <!-- Cuando está desactivado enviar campo vacío para limpiar -->
               <input type="hidden" name="declaracion_activa_off" value="0">
+            </div>
+          </div>
+
+          <!-- NUESTRO PLUS toggle -->
+          <?php
+          $plusActivo = ($proceso['plus_activo'] ?? '1') !== '0';
+          $plusTextoDefault = 'Servicio de Antispam Dedicado - Protección Avanzada Contra el Correo No Deseado
+Ofrecemos un sistema antispam dedicado, completamente gratuito durante el periodo de contratación, que garantiza un 99% de efectividad en la detección de spam. Este servicio avanzado incluye cuarentenas configurables, gestión de listas blancas y negras, y un potente sistema AntiSpam/Antivirus que permite establecer políticas personalizadas para filtrar correos por contenido, asunto, remitente y más.
+
+Entre sus principales características se incluyen:
+• Sistema de Cuarentena configurable
+• Lista blanca y negra general y por usuarios.
+• Mail Traking Center para seguimiento, registro y análisis de envío y recepción de correos
+• IP dedicada de salida con servicio de IP Whitelist
+• Compatibilidad con protocolos IMAP, POP3 y SMTP.
+• Conexiones cifradas mediante SSL en Postfix.
+• Consultas RBL para detección de IPs en listas negras.
+• Configuración de registros DNS esenciales (PTR, DKIM, SPF, DMARC).
+• Implementación de políticas de seguridad en clases de servicio (fallos de inicio de sesión, contraseñas seguras, entre otros).
+• Escaneo y detección de ataques como spoofing y phishing.
+• Control de envíos por tiempo, incluyendo restricciones de acceso, con alerta de correo al administrador, con el fin de evitar el envío masivo de spam en caso de cuentas comprometidas.
+Este servicio proporciona una solución integral para la protección y gestión del correo electrónico, asegurando una comunicación segura y libre de amenazas.';
+          $plusTexto = !empty($proceso['plus_texto']) ? $proceso['plus_texto'] : $plusTextoDefault;
+          ?>
+          <div class="col-12">
+            <div class="border rounded p-2" style="background:#fffbf0;border-color:#f39c12!important">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" role="switch"
+                           id="togglePlus" name="plus_activo" value="1"
+                           <?= $plusActivo ? 'checked' : '' ?>
+                           onchange="
+                             document.getElementById('plusBody').classList.toggle('d-none', !this.checked);
+                             document.getElementById('badgePlus').textContent = this.checked ? 'Incluida en proforma' : 'Desactivada';
+                             document.getElementById('badgePlus').className = 'badge small ' + (this.checked ? 'bg-warning text-dark' : 'bg-secondary');
+                           ">
+                    <label class="form-check-label fw-semibold small" for="togglePlus">
+                      <i class="bi bi-star-fill me-1 text-warning"></i>NUESTRO PLUS
+                    </label>
+                  </div>
+                  <span class="badge <?= $plusActivo ? 'bg-warning text-dark' : 'bg-secondary' ?> small" id="badgePlus">
+                    <?= $plusActivo ? 'Incluida en proforma' : 'Desactivada' ?>
+                  </span>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size:10px"
+                        onclick="document.getElementById('plusEditor').classList.toggle('d-none')">
+                  <i class="bi bi-pencil"></i> Editar texto
+                </button>
+              </div>
+              <div id="plusBody" class="<?= !$plusActivo ? 'd-none' : '' ?>">
+                <div id="plusPreview" class="small text-muted px-2 py-1 rounded fst-italic"
+                     style="background:#fef9e7;font-size:11px;line-height:1.5;white-space:pre-line">
+                  <?= e($plusTexto) ?>
+                </div>
+                <div id="plusEditor" class="d-none mt-2">
+                  <textarea name="plus_texto" id="plus_texto"
+                            class="form-control form-control-sm" rows="8"
+                            style="font-size:11px"
+                            onkeyup="document.getElementById('plusPreview').textContent=this.value"
+                            ><?= e($plusTexto) ?></textarea>
+                  <small class="text-muted">Este texto aparece como sección "NUESTRO PLUS" en la proforma.</small>
+                </div>
+              </div>
+              <input type="hidden" name="plus_activo_off" value="0">
             </div>
           </div>
 

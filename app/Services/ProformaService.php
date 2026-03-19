@@ -20,7 +20,7 @@ class ProformaService
     {
         return [
             'color_primario'   => '#1B4F72',
-            'proforma_numero'  => date('Y') . '-001',
+            'proforma_numero'  => date('Y') . '-353',
             'forma_pago'       => 'Contra entrega del servicio/bien',
             'vigencia_oferta'  => '30 días calendario',
             'texto_adicional'  => '',
@@ -70,7 +70,8 @@ class ProformaService
             $html = $plantilla['contenido_html'];
             // Si la plantilla guardada no tiene las variables nuevas, usar la default actualizada
             if (strpos($html, '{{proceso.especificaciones}}') === false
-                || strpos($html, '{{proceso.declaracion}}') === false) {
+                || strpos($html, '{{proceso.declaracion}}') === false
+                || strpos($html, '{{proceso.plus}}') === false) {
                 return self::plantillaDefault();
             }
             return $html;
@@ -172,6 +173,7 @@ class ProformaService
             '{{proceso.plazo_texto}}'      => htmlspecialchars($proceso['plazo_texto'] ?? ''),
             '{{proceso.forma_pago}}'       => self::seccionFormaPago($proceso),
             '{{proceso.declaracion}}'      => self::seccionDeclaracion($proceso),
+            '{{proceso.plus}}'             => self::seccionPlus($proceso),
             '{{proceso.campos_extra}}'     => self::seccionCamposExtra($proceso),
             // Vigencia: tomar del proceso primero, si no del config
             '{{proceso.vigencia_oferta}}'  => htmlspecialchars(
@@ -367,6 +369,36 @@ class ProformaService
             '</div></div>';
     }
 
+    // ── Sección HTML Nuestro Plus ─────────────────────────────────────────
+    private static function seccionPlus(array $proceso): string
+    {
+        if (($proceso['plus_activo'] ?? '1') === '0') return '';
+
+        $textoDefault = 'Servicio de Antispam Dedicado - Protección Avanzada Contra el Correo No Deseado
+Ofrecemos un sistema antispam dedicado, completamente gratuito durante el periodo de contratación, que garantiza un 99% de efectividad en la detección de spam. Este servicio avanzado incluye cuarentenas configurables, gestión de listas blancas y negras, y un potente sistema AntiSpam/Antivirus que permite establecer políticas personalizadas para filtrar correos por contenido, asunto, remitente y más.
+
+Entre sus principales características se incluyen:
+• Sistema de Cuarentena configurable
+• Lista blanca y negra general y por usuarios.
+• Mail Traking Center para seguimiento, registro y análisis de envío y recepción de correos
+• IP dedicada de salida con servicio de IP Whitelist
+• Compatibilidad con protocolos IMAP, POP3 y SMTP.
+• Conexiones cifradas mediante SSL en Postfix.
+• Consultas RBL para detección de IPs en listas negras.
+• Configuración de registros DNS esenciales (PTR, DKIM, SPF, DMARC).
+• Implementación de políticas de seguridad en clases de servicio (fallos de inicio de sesión, contraseñas seguras, entre otros).
+• Escaneo y detección de ataques como spoofing y phishing.
+• Control de envíos por tiempo, incluyendo restricciones de acceso, con alerta de correo al administrador, con el fin de evitar el envío masivo de spam en caso de cuentas comprometidas.
+Este servicio proporciona una solución integral para la protección y gestión del correo electrónico, asegurando una comunicación segura y libre de amenazas.';
+
+        $texto = trim($proceso['plus_texto'] ?? '') ?: $textoDefault;
+        return '<div style="margin-bottom:12px">
+            <div class="sec-tit" style="color:#c0392b">&#11088; NUESTRO PLUS</div>
+            <div style="font-size:9.5pt;line-height:1.6;white-space:pre-line">'
+            . htmlspecialchars($texto) .
+            '</div></div>';
+    }
+
     // ── Sanitizar HTML del CKEditor para PDF ─────────────────────────────
     private static function sanitizarHtmlEditor(string $html): string
     {
@@ -396,7 +428,7 @@ class ProformaService
             'TDR / Oferta' => ['{{proceso.especificaciones}}','{{proceso.metodologia}}',
                                '{{proceso.cpc}}','{{proceso.plazo_texto}}',
                                '{{proceso.forma_pago}}','{{proceso.declaracion}}',
-                               '{{proceso.vigencia_oferta}}','{{proceso.campos_extra}}'],
+                               '{{proceso.plus}}','{{proceso.vigencia_oferta}}','{{proceso.campos_extra}}'],
             'Institución'  => ['{{institucion.nombre}}','{{institucion.ruc}}','{{institucion.ciudad}}',
                                '{{institucion.administrador}}','{{institucion.cargo_admin}}',
                                '{{institucion.email_admin}}','{{institucion.direccion}}'],
@@ -547,6 +579,9 @@ class ProformaService
 
   <!-- 8. DECLARACIÓN DE CUMPLIMIENTO -->
   {{proceso.declaracion}}
+
+  <!-- NUESTRO PLUS -->
+  {{proceso.plus}}
 
   {{proceso.campos_extra}}
   {{config.texto_adicional}}

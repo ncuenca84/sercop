@@ -610,6 +610,10 @@ class ProcesosController extends BaseController
         if ($update['declaracion_activa'] === '0') {
             $update['declaracion_cumplimiento'] = null;
         }
+
+        // Nuestro Plus toggle (columnas opcionales — try/catch si no existe migración)
+        $plusActivoVal = ($_POST['plus_activo'] ?? $_POST['plus_activo_off'] ?? '1') === '1' ? '1' : '0';
+        $plusTextoVal  = isset($_POST['plus_texto']) && $_POST['plus_texto'] !== '' ? $_POST['plus_texto'] : null;
         // Campos numéricos — solo actualizar si vienen con valor
         if (!empty($_POST['monto_total'])) $update['monto_total'] = (float)$_POST['monto_total'];
         if (!empty($_POST['plazo_dias']))  $update['plazo_dias']  = (int)$_POST['plazo_dias'];
@@ -626,6 +630,16 @@ class ProcesosController extends BaseController
             } catch (\Throwable $e) {
                 // La columna secciones_titulos aún no existe: ignorar sin bloquear
             }
+        }
+
+        // Guardar Nuestro Plus (columnas opcionales — requiere migración)
+        try {
+            Proceso::update((int)$id, [
+                'plus_activo' => $plusActivoVal,
+                'plus_texto'  => $plusTextoVal,
+            ]);
+        } catch (\Throwable $e) {
+            // Columnas plus_activo/plus_texto aún no existen: ignorar sin bloquear
         }
 
         // Guardar campos extra dinámicos
