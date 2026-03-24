@@ -1754,6 +1754,8 @@ class ProformaController extends BaseController
                     'margin_right'  => 20,
                     'tempDir'       => sys_get_temp_dir(),
                 ]);
+                // Forzar impresión de fondos y colores (evita texto negro sobre fondo azul)
+                $mpdf->allow_charset_conversion = true;
                 $mpdf->SetTitle('Proforma - ' . $proceso['numero_proceso']);
                 $mpdf->WriteHTML($html);
                 $mpdf->Output($nombreArchivo, 'D'); // D = descarga directa

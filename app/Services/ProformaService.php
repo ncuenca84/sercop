@@ -524,12 +524,12 @@ Este servicio proporciona una solución integral para la protección y gestión 
   .doc-titulo{text-align:center;margin:10px 0 14px}
   .doc-titulo h1{font-size:13pt;font-weight:bold;text-transform:uppercase;color:{{config.color_primario}}}
   .doc-fecha{text-align:right;font-size:9pt;color:#555;margin-bottom:10px}
-  .sec-tit{background:{{config.color_primario}};color:white;font-weight:bold;font-size:9pt;padding:4px 8px;margin-bottom:6px;text-transform:uppercase}
+  .sec-tit{background:{{config.color_primario}};background-color:{{config.color_primario}};color:white;font-weight:bold;font-size:9pt;padding:4px 8px;margin-bottom:6px;text-transform:uppercase}
   .campo{display:flex;gap:6px;margin-bottom:3px;font-size:9.5pt}
   .campo strong{min-width:160px;color:#333}
   table{width:100%;border-collapse:collapse;margin:6px 0;font-size:9pt}
-  thead tr{background:{{config.color_primario}};color:white}
-  thead th{padding:5px 6px;text-align:left}
+  thead tr{background:{{config.color_primario}};background-color:{{config.color_primario}};color:white}
+  thead tr th,thead th{background:{{config.color_primario}};background-color:{{config.color_primario}};color:white;padding:5px 6px;text-align:left;font-weight:bold}
   tbody tr:nth-child(even){background:#f5f7fa}
   tbody td{padding:5px 6px;border-bottom:1px solid #e0e0e0;vertical-align:top}
   /* Tablas generadas por CKEditor */
@@ -598,14 +598,14 @@ Este servicio proporciona una solución integral para la protección y gestión 
 
   <!-- 1. PROPUESTA ECONÓMICA -->
   <div style="margin-bottom:12px"><div class="sec-tit">Propuesta Económica</div>
-    <table><thead><tr>
-      <th style="width:4%;text-align:center">N°</th>
-      <th style="width:10%">CPC</th>
-      <th>Descripción</th>
-      <th style="width:10%">Unidad</th>
-      <th style="width:7%;text-align:center">Cant.</th>
-      <th style="width:11%;text-align:right">P. Unit.</th>
-      <th style="width:11%;text-align:right">Total</th>
+    <table><thead><tr style="background-color:{{config.color_primario}}">
+      <th style="width:4%;text-align:center;background-color:{{config.color_primario}};color:white;font-weight:bold">N°</th>
+      <th style="width:10%;background-color:{{config.color_primario}};color:white;font-weight:bold">CPC</th>
+      <th style="background-color:{{config.color_primario}};color:white;font-weight:bold">Descripción</th>
+      <th style="width:10%;background-color:{{config.color_primario}};color:white;font-weight:bold">Unidad</th>
+      <th style="width:7%;text-align:center;background-color:{{config.color_primario}};color:white;font-weight:bold">Cant.</th>
+      <th style="width:11%;text-align:right;background-color:{{config.color_primario}};color:white;font-weight:bold">P. Unit.</th>
+      <th style="width:11%;text-align:right;background-color:{{config.color_primario}};color:white;font-weight:bold">Total</th>
     </tr></thead>
     <tbody>{{items_tabla}}</tbody>
     </table>
