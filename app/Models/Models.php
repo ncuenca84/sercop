@@ -189,22 +189,24 @@ class ProcesoItem extends BaseModel
     public static function sincronizar(int $procesoId, array $items): void
     {
         $tid = DB::getTenantId();
-        // Soft-delete anteriores
-        DB::query("UPDATE proceso_items SET deleted_at = NOW() WHERE proceso_id = ? AND tenant_id = ?", [$procesoId, $tid]);
-        foreach ($items as $it) {
-            DB::insert('proceso_items', [
-                'proceso_id'      => $procesoId,
-                'tenant_id'       => $tid,
-                'numero'          => (int)($it['numero'] ?? 0),
-                'cpc'             => ($it['cpc'] ?? '') ?: null,
-                'cpc_descripcion' => ($it['cpc_descripcion'] ?? '') ?: null,
-                'descripcion'     => ($it['descripcion'] ?? '') ?: null,
-                'unidad'          => ($it['unidad'] ?? '') ?: null,
-                'cantidad'        => (float)($it['cantidad'] ?? 0),
-                'precio_unitario' => (float)($it['precio_unitario'] ?? 0),
-                'precio_total'    => (float)($it['precio_total'] ?? 0),
-            ]);
-        }
+        DB::transaction(function() use ($procesoId, $tid, $items) {
+            // Soft-delete anteriores dentro de la transacción
+            DB::query("UPDATE proceso_items SET deleted_at = NOW() WHERE proceso_id = ? AND tenant_id = ?", [$procesoId, $tid]);
+            foreach ($items as $it) {
+                DB::insert('proceso_items', [
+                    'proceso_id'      => $procesoId,
+                    'tenant_id'       => $tid,
+                    'numero'          => (int)($it['numero'] ?? 0),
+                    'cpc'             => ($it['cpc'] ?? '') ?: null,
+                    'cpc_descripcion' => ($it['cpc_descripcion'] ?? '') ?: null,
+                    'descripcion'     => ($it['descripcion'] ?? '') ?: null,
+                    'unidad'          => ($it['unidad'] ?? '') ?: null,
+                    'cantidad'        => (float)($it['cantidad'] ?? 0),
+                    'precio_unitario' => (float)($it['precio_unitario'] ?? 0),
+                    'precio_total'    => (float)($it['precio_total'] ?? 0),
+                ]);
+            }
+        });
     }
 }
 

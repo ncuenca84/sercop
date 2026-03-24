@@ -302,12 +302,13 @@
           </div>
 
           <!-- 0. ÍTEMS DEL PROCESO (extraídos de SERCOP) -->
-          <?php if(!empty($items)): ?>
           <div class="col-12">
             <div class="d-flex align-items-center justify-content-between mb-2">
               <label class="form-label fw-semibold small mb-0">
                 <i class="bi bi-table me-1 text-primary"></i>Ítems del Proceso
+                <?php if(!empty($items)): ?>
                 <span class="badge bg-primary ms-1"><?= count($items) ?> ítem<?= count($items) !== 1 ? 's' : '' ?></span>
+                <?php endif; ?>
               </label>
               <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size:11px"
                       onclick="document.getElementById('tablaItemsWrap').classList.toggle('d-none')">
@@ -364,12 +365,18 @@
                   </tfoot>
                 </table>
               </div>
+              <?php if(empty($items)): ?>
+              <div class="text-center text-muted py-3 small">
+                <i class="bi bi-inbox fs-4 d-block mb-1"></i>
+                No hay ítems cargados. Se generarán al importar desde SERCOP.
+              </div>
+              <?php else: ?>
               <small class="text-muted mt-1 d-block">
                 <i class="bi bi-info-circle me-1"></i>Ingresa los precios unitarios — el total se calcula automáticamente y actualiza el Monto del proceso al guardar.
               </small>
+              <?php endif; ?>
             </div>
           </div>
-          <?php endif; ?>
 
           <?php
           // ── Títulos personalizables de secciones de Fase 2 ────────────────
