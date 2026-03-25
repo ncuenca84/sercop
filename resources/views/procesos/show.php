@@ -283,12 +283,12 @@
 
           <!-- Campos base: Monto y Plazo días -->
           <div class="col-md-6">
-            <label class="form-label fw-semibold small">Monto (USD)</label>
+            <label class="form-label fw-semibold small">Monto (USD) <span class="text-muted fw-normal">— calculado desde ítems</span></label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">$</span>
-              <input type="number" step="0.01" name="monto_total" class="form-control"
+              <input type="number" step="0.01" name="monto_total" id="montoTotalInput" class="form-control bg-light"
                      value="<?= $proceso['monto_total'] > 0 ? $proceso['monto_total'] : '' ?>"
-                     placeholder="0.00" min="0">
+                     placeholder="0.00" min="0" readonly>
             </div>
           </div>
           <div class="col-md-6">
@@ -356,11 +356,18 @@
                     <?php endforeach; ?>
                   </tbody>
                   <tfoot class="table-light">
+                    <?php $subtotal = ProcesoItem::totalMonto($proceso['id']); $iva = round($subtotal * 0.15, 2); $total = $subtotal + $iva; ?>
+                    <tr>
+                      <td colspan="6" class="text-end small pe-2">SUBTOTAL:</td>
+                      <td class="text-end small" id="itemsSubtotal">$<?= number_format($subtotal, 2) ?></td>
+                    </tr>
+                    <tr>
+                      <td colspan="6" class="text-end small pe-2">IVA 15%:</td>
+                      <td class="text-end small" id="itemsIva">$<?= number_format($iva, 2) ?></td>
+                    </tr>
                     <tr>
                       <td colspan="6" class="text-end fw-bold small pe-2">TOTAL:</td>
-                      <td class="text-end fw-bold text-success" id="itemsTotalGeneral">
-                        $<?= number_format(ProcesoItem::totalMonto($proceso['id']), 2) ?>
-                      </td>
+                      <td class="text-end fw-bold text-success" id="itemsTotalGeneral">$<?= number_format($total, 2) ?></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -1375,13 +1382,24 @@ function recalcularItem(input) {
 }
 
 function recalcularTotalGeneral() {
-  let suma = 0;
+  let subtotal = 0;
   document.querySelectorAll('#tablaItems tbody tr').forEach(tr => {
-    const txt = tr.querySelector('.item-total').textContent.replace('$','').replace(',','');
-    suma += parseFloat(txt) || 0;
+    const txt = tr.querySelector('.item-total')?.textContent.replace(/[$,]/g,'') || '0';
+    subtotal += parseFloat(txt) || 0;
   });
-  const el = document.getElementById('itemsTotalGeneral');
-  if (el) el.textContent = '$' + suma.toFixed(2);
+  const iva   = Math.round(subtotal * 0.15 * 100) / 100;
+  const total = Math.round((subtotal + iva) * 100) / 100;
+
+  const elSub = document.getElementById('itemsSubtotal');
+  const elIva = document.getElementById('itemsIva');
+  const elTot = document.getElementById('itemsTotalGeneral');
+  const elMonto = document.getElementById('montoTotalInput');
+
+  if (elSub) elSub.textContent = '$' + subtotal.toFixed(2);
+  if (elIva) elIva.textContent = '$' + iva.toFixed(2);
+  if (elTot) elTot.textContent = '$' + total.toFixed(2);
+  // Actualizar el campo Monto (readonly) con el total con IVA
+  if (elMonto) elMonto.value = total.toFixed(2);
 }
 
 // Antes de enviar el form, serializar ítems + sincronizar TinyMCE
@@ -1408,11 +1426,12 @@ document.getElementById('formFase2').addEventListener('submit', function() {
     });
     inputJson.value = JSON.stringify(data);
 
-    // Si hay ítems y el campo monto está vacío, calcularlo automáticamente
-    const montoInput = document.querySelector('[name=monto_total]');
-    if (montoInput && (!montoInput.value || montoInput.value === '0')) {
-      const total = data.reduce((s, i) => s + i.precio_total, 0);
-      if (total > 0) montoInput.value = total.toFixed(2);
+    // Recalcular monto con IVA y escribirlo en el campo readonly antes de enviar
+    if (data.length > 0) {
+      const subtotal = data.reduce((s, i) => s + i.precio_total, 0);
+      const totalConIva = Math.round((subtotal * 1.15) * 100) / 100;
+      const montoInput = document.getElementById('montoTotalInput');
+      if (montoInput && totalConIva > 0) montoInput.value = totalConIva.toFixed(2);
     }
   }
 });
