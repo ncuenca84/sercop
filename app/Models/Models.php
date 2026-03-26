@@ -109,6 +109,10 @@ class Proceso extends BaseModel
             $params[] = "%{$filtros['buscar']}%";
             $params[] = "%{$filtros['buscar']}%";
         }
+        if (!empty($filtros['fecha_desde']))  { $where[] = 'p.fecha_inicio >= ?';  $params[] = $filtros['fecha_desde']; }
+        if (!empty($filtros['fecha_hasta']))  { $where[] = 'p.fecha_inicio <= ?';  $params[] = $filtros['fecha_hasta']; }
+        // Filtro por N° proforma (lookup en tenant config JSON)
+        if (!empty($filtros['proforma_id']))  { $where[] = 'p.id = ?';             $params[] = (int)$filtros['proforma_id']; }
 
         $whereStr = implode(' AND ', $where);
         $sql = "SELECT p.*, i.nombre AS institucion_nombre

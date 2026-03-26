@@ -54,6 +54,9 @@
           <tr><th class="text-muted">Fecha Inicio</th><td><?= formatDate($proceso['fecha_inicio']) ?></td></tr>
           <tr><th class="text-muted">Fecha Fin</th><td><?= formatDate($proceso['fecha_fin_calculada']) ?></td></tr>
           <tr><th class="text-muted">Garantía Técnica</th><td><?= $proceso['tiene_garantia'] ? $proceso['plazo_garantia_dias'].' días' : 'No aplica' ?></td></tr>
+          <?php if(!empty($proceso['notas_internas'])): ?>
+          <tr><th class="text-muted">Notas Internas</th><td><span class="small text-muted fst-italic"><?= nl2br(e($proceso['notas_internas'])) ?></span></td></tr>
+          <?php endif; ?>
         </table>
       </div>
     </div>

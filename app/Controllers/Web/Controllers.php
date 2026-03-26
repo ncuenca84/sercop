@@ -334,6 +334,15 @@ class ProcesosController extends BaseController
     {
         $filtros    = $_GET;
         $page       = (int)($filtros['page'] ?? 1);
+
+        // Resolver N° de proforma → proceso_id para el filtro
+        if (!empty($filtros['proforma'])) {
+            $cfg = \Services\ProformaService::getConfig(tenantId());
+            $numeros = $cfg['proforma_numeros'] ?? [];
+            $pid = array_search(trim($filtros['proforma']), $numeros);
+            $filtros['proforma_id'] = $pid ? (int)$pid : -1; // -1 = sin resultados
+        }
+
         $paginator  = Proceso::listar($filtros, $page);
         $instituciones = Institucion::all('nombre ASC');
         $this->view('procesos.index', compact('paginator', 'instituciones', 'filtros') + ['title' => 'Procesos']);

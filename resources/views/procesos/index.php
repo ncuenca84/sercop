@@ -13,9 +13,13 @@
 <div class="card mb-4">
   <div class="card-body p-3">
     <form method="GET" class="row g-2 align-items-end">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <input type="text" name="buscar" class="form-control form-control-sm"
-               placeholder="🔍 Buscar por número o descripción..." value="<?= e($filtros['buscar'] ?? '') ?>">
+               placeholder="🔍 Número, NIC o descripción..." value="<?= e($filtros['buscar'] ?? '') ?>">
+      </div>
+      <div class="col-md-2">
+        <input type="text" name="proforma" class="form-control form-control-sm"
+               placeholder="N° Proforma (ej: 2026-353)" value="<?= e($filtros['proforma'] ?? '') ?>">
       </div>
       <div class="col-md-2">
         <select name="estado" class="form-select form-select-sm">
@@ -25,13 +29,21 @@
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <select name="institucion" class="form-select form-select-sm">
           <option value="">Todas las instituciones</option>
           <?php foreach($instituciones as $i): ?>
           <option value="<?= $i['id'] ?>" <?= ($filtros['institucion']??'')==$i['id']?'selected':'' ?>><?= e($i['nombre']) ?></option>
           <?php endforeach; ?>
         </select>
+      </div>
+      <div class="col-md-1">
+        <input type="date" name="fecha_desde" class="form-control form-control-sm"
+               title="Fecha desde" value="<?= e($filtros['fecha_desde'] ?? '') ?>">
+      </div>
+      <div class="col-md-1">
+        <input type="date" name="fecha_hasta" class="form-control form-control-sm"
+               title="Fecha hasta" value="<?= e($filtros['fecha_hasta'] ?? '') ?>">
       </div>
       <div class="col-auto">
         <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search me-1"></i>Filtrar</button>
