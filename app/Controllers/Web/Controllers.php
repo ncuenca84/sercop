@@ -345,7 +345,9 @@ class ProcesosController extends BaseController
 
         $paginator  = Proceso::listar($filtros, $page);
         $instituciones = Institucion::all('nombre ASC');
-        $this->view('procesos.index', compact('paginator', 'instituciones', 'filtros') + ['title' => 'Procesos']);
+        $cfg = \Services\ProformaService::getConfig(tenantId());
+        $proformaNumeros = $cfg['proforma_numeros'] ?? [];
+        $this->view('procesos.index', compact('paginator', 'instituciones', 'filtros', 'proformaNumeros') + ['title' => 'Procesos']);
     }
 
     public function create(): void

@@ -58,7 +58,7 @@
   <div class="table-responsive">
     <table class="table table-hover mb-0">
       <thead><tr>
-        <th>N° Proceso</th><th>Objeto / Descripción</th><th>Institución</th>
+        <th>N° Proceso</th><th>N° Proforma</th><th>Institución</th>
         <th>Monto</th><th>Plazo</th><th>Estado</th><th>Avance</th><th></th>
       </tr></thead>
       <tbody>
@@ -66,7 +66,7 @@
         <tr>
           <td><a href="/procesos/<?= $p['id'] ?>" class="fw-semibold text-decoration-none text-primary"><?= e($p['numero_proceso']) ?></a>
               <br><small class="text-muted"><?= formatDate($p['fecha_inicio']) ?></small></td>
-          <td><small><?= e(truncate($p['objeto_contratacion'], 60)) ?></small></td>
+          <td><?php if(!empty($proformaNumeros[$p['id']])): ?><span class="badge bg-primary"><?= e($proformaNumeros[$p['id']]) ?></span><?php else: ?><span class="text-muted small">—</span><?php endif; ?></td>
           <td><small><?= e(truncate($p['institucion_nombre'], 35)) ?></small></td>
           <td class="fw-semibold small"><?= money($p['monto_total']) ?></td>
           <td><small><?= $p['plazo_dias'] ?> días</small></td>
