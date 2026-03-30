@@ -286,12 +286,12 @@
 
           <!-- Campos base: Monto y Plazo días -->
           <div class="col-md-6">
-            <label class="form-label fw-semibold small">Monto (USD) <span class="text-muted fw-normal">— calculado desde ítems o ingrese manualmente</span></label>
+            <label class="form-label fw-semibold small">Monto (USD) <span class="text-muted fw-normal">— calculado desde ítems</span></label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">$</span>
-              <input type="number" step="0.01" name="monto_total" id="montoTotalInput" class="form-control"
+              <input type="number" step="0.01" name="monto_total" id="montoTotalInput" class="form-control bg-light"
                      value="<?= $proceso['monto_total'] > 0 ? $proceso['monto_total'] : '' ?>"
-                     placeholder="0.00" min="0">
+                     placeholder="0.00" min="0" readonly>
             </div>
           </div>
           <div class="col-md-6">
@@ -375,16 +375,14 @@
                   </tfoot>
                 </table>
               </div>
-              <?php if(empty($items)): ?>
-              <div class="text-center text-muted py-3 small">
-                <i class="bi bi-inbox fs-4 d-block mb-1"></i>
-                No hay ítems cargados. Se generarán al importar desde SERCOP.
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>Ingresa los precios unitarios — el total con IVA 15% actualiza el Monto al guardar.
+                </small>
+                <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:12px" onclick="addItemRow()">
+                  <i class="bi bi-plus-circle me-1"></i>Agregar ítem
+                </button>
               </div>
-              <?php else: ?>
-              <small class="text-muted mt-1 d-block">
-                <i class="bi bi-info-circle me-1"></i>Ingresa los precios unitarios — el total se calcula automáticamente y actualiza el Monto del proceso al guardar.
-              </small>
-              <?php endif; ?>
             </div>
           </div>
 
@@ -1376,12 +1374,32 @@ function nombreCampoLabel(campo) {
 <script>
 // ── ITEMS: recalcular fila al cambiar precio unitario ────────────────────
 function recalcularItem(input) {
-  const tr       = input.closest('tr');
-  const cantidad = parseFloat(tr.dataset.cantidad) || 0;
-  const precio   = parseFloat(input.value) || 0;
-  const total    = cantidad * precio;
+  const tr        = input.closest('tr');
+  const cantInput = tr.querySelector('.item-cant-input');
+  const cantidad  = cantInput ? (parseFloat(cantInput.value) || 0) : (parseFloat(tr.dataset.cantidad) || 0);
+  const precio    = parseFloat(input.value) || 0;
+  const total     = cantidad * precio;
   tr.querySelector('.item-total').textContent = '$' + total.toFixed(2);
   recalcularTotalGeneral();
+}
+
+function addItemRow() {
+  const tbody = document.querySelector('#tablaItems tbody');
+  const n = tbody.querySelectorAll('tr').length + 1;
+  const tr = document.createElement('tr');
+  tr.dataset.num = n; tr.dataset.cpc = ''; tr.dataset.cpcDesc = ''; tr.dataset.unidad = ''; tr.dataset.cantidad = '1'; tr.dataset.manual = '1';
+  tr.innerHTML = `
+    <td class="text-center align-middle">${n}</td>
+    <td class="align-middle small text-muted"></td>
+    <td class="align-middle"><input type="text" class="form-control form-control-sm item-desc-input" placeholder="Descripción del producto/servicio"></td>
+    <td class="align-middle"><input type="text" class="form-control form-control-sm item-unidad-input" value="Global" style="width:70px"></td>
+    <td class="text-center align-middle"><input type="number" class="form-control form-control-sm text-center item-cant-input" value="1" min="0.01" step="0.01" style="width:70px" onchange="recalcularItem(this.closest('tr').querySelector('.item-precio'))"></td>
+    <td class="text-end align-middle">
+      <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end p-1 item-precio" style="width:80px;margin-left:auto" value="0.00" onchange="recalcularItem(this)">
+    </td>
+    <td class="text-end align-middle fw-semibold item-total">$0.00</td>
+  `;
+  tbody.appendChild(tr);
 }
 
 function recalcularTotalGeneral() {
@@ -1414,14 +1432,19 @@ document.getElementById('formFase2').addEventListener('submit', function() {
   if (inputJson) {
     const rows = document.querySelectorAll('#tablaItems tbody tr');
     const data = Array.from(rows).map(tr => {
-      const precio   = parseFloat(tr.querySelector('.item-precio')?.value) || 0;
-      const cantidad = parseFloat(tr.dataset.cantidad) || 0;
+      const precio      = parseFloat(tr.querySelector('.item-precio')?.value) || 0;
+      const cantInput   = tr.querySelector('.item-cant-input');
+      const cantidad    = cantInput ? (parseFloat(cantInput.value) || 0) : (parseFloat(tr.dataset.cantidad) || 0);
+      const descInput   = tr.querySelector('.item-desc-input');
+      const descripcion = descInput ? descInput.value.trim() : tr.querySelector('td:nth-child(3)').textContent.trim();
+      const unidadInput = tr.querySelector('.item-unidad-input');
+      const unidad      = unidadInput ? unidadInput.value.trim() : (tr.dataset.unidad || '');
       return {
         numero:          parseInt(tr.dataset.num) || 0,
         cpc:             tr.dataset.cpc          || '',
         cpc_descripcion: tr.dataset.cpcDesc      || '',
-        descripcion:     tr.querySelector('td:nth-child(3)').textContent.trim(),
-        unidad:          tr.dataset.unidad       || '',
+        descripcion:     descripcion,
+        unidad:          unidad,
         cantidad:        cantidad,
         precio_unitario: precio,
         precio_total:    +(cantidad * precio).toFixed(2),
