@@ -286,12 +286,12 @@
 
           <!-- Campos base: Monto y Plazo días -->
           <div class="col-md-6">
-            <label class="form-label fw-semibold small">Monto (USD) <span class="text-muted fw-normal">— calculado desde ítems</span></label>
+            <label class="form-label fw-semibold small">Monto (USD) <span class="text-muted fw-normal">— calculado desde ítems o ingrese manualmente</span></label>
             <div class="input-group input-group-sm">
               <span class="input-group-text">$</span>
-              <input type="number" step="0.01" name="monto_total" id="montoTotalInput" class="form-control bg-light"
+              <input type="number" step="0.01" name="monto_total" id="montoTotalInput" class="form-control"
                      value="<?= $proceso['monto_total'] > 0 ? $proceso['monto_total'] : '' ?>"
-                     placeholder="0.00" min="0" readonly>
+                     placeholder="0.00" min="0">
             </div>
           </div>
           <div class="col-md-6">
@@ -1429,7 +1429,7 @@ document.getElementById('formFase2').addEventListener('submit', function() {
     });
     inputJson.value = JSON.stringify(data);
 
-    // Recalcular monto con IVA y escribirlo en el campo readonly antes de enviar
+    // Recalcular monto con IVA y escribirlo si hay ítems (si no, se usa el valor manual)
     if (data.length > 0) {
       const subtotal = data.reduce((s, i) => s + i.precio_total, 0);
       const totalConIva = Math.round((subtotal * 1.15) * 100) / 100;
