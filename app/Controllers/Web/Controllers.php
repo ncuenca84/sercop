@@ -483,23 +483,30 @@ class ProcesosController extends BaseController
         $institucionId = (int)($_POST['institucion_id'] ?? 0);
 
         if (!empty($_POST['nueva_institucion']) && $institucionId === 0) {
-            $instNombre = trim($_POST['inst_nombre'] ?? '');
+            $instNombre = strtoupper(trim($_POST['inst_nombre'] ?? ''));
             if (empty($instNombre)) {
                 View::flash('error', 'El nombre de la institución es obligatorio.');
                 $this->redirect('/procesos/crear');
                 return;
             }
-            $institucionId = (int) Institucion::create([
-                'nombre'               => strtoupper($instNombre),
-                'ruc'                  => trim($_POST['inst_ruc']           ?? '0000000000001'),
-                'ciudad'               => trim($_POST['inst_ciudad']        ?? ''),
-                'direccion'            => trim($_POST['inst_direccion']     ?? ''),
-                'administrador_nombre' => trim($_POST['inst_administrador'] ?? ''),
-                'administrador_email'  => trim($_POST['inst_email']         ?? ''),
-                'administrador_cargo'  => 'Administrador del Contrato',
-                'activo'               => 1,
-            ]);
-            DB::audit('CREATE', 'instituciones', $institucionId, null, ['nombre' => $instNombre]);
+            // Buscar si ya existe por nombre (evitar duplicados)
+            $existente = Institucion::whereOne(['nombre' => $instNombre]);
+            if ($existente) {
+                $institucionId = (int)$existente['id'];
+            } else {
+                $institucionId = (int) Institucion::create([
+                    'nombre'               => $instNombre,
+                    'ruc'                  => trim($_POST['inst_ruc']           ?? '0000000000001'),
+                    'ciudad'               => trim($_POST['inst_ciudad']        ?? ''),
+                    'direccion'            => trim($_POST['inst_direccion']     ?? ''),
+                    'administrador_nombre' => trim($_POST['inst_administrador'] ?? ''),
+                    'administrador_email'  => trim($_POST['inst_email']         ?? ''),
+                    'administrador_cargo'  => 'Administrador del Contrato',
+                    'activo'               => 1,
+                ]);
+            } else {
+                DB::audit('CREATE', 'instituciones', $institucionId, null, ['nombre' => $instNombre]);
+            }
         }
 
         if (!$institucionId) {
