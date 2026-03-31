@@ -70,7 +70,7 @@ class Institucion extends BaseModel
              LEFT JOIN facturas f ON f.proceso_id = p.id
              LEFT JOIN pagos pg ON pg.factura_id = f.id
              WHERE i.tenant_id = ? AND i.deleted_at IS NULL
-             GROUP BY i.id ORDER BY total_procesos DESC",
+             GROUP BY i.id ORDER BY i.created_at DESC",
             [DB::getTenantId()]
         );
     }

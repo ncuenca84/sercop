@@ -344,7 +344,7 @@ class ProcesosController extends BaseController
         }
 
         $paginator  = Proceso::listar($filtros, $page);
-        $instituciones = Institucion::all('nombre ASC');
+        $instituciones = Institucion::all('created_at DESC');
         $cfg = \Services\ProformaService::getConfig(tenantId());
         $proformaNumeros = $cfg['proforma_numeros'] ?? [];
         $this->view('procesos.index', compact('paginator', 'instituciones', 'filtros', 'proformaNumeros') + ['title' => 'Procesos']);
@@ -353,7 +353,7 @@ class ProcesosController extends BaseController
     public function create(): void
     {
         $this->requirePermission('procesos.*');
-        $instituciones = Institucion::all('nombre ASC');
+        $instituciones = Institucion::all('created_at DESC');
         $this->view('procesos.create', compact('instituciones') + ['title' => 'Nuevo Proceso']);
     }
 
@@ -362,7 +362,7 @@ class ProcesosController extends BaseController
     {
         $this->requirePermission('procesos.*');
         verifyCsrf();
-        $instituciones = Institucion::all('nombre ASC');
+        $instituciones = Institucion::all('created_at DESC');
         $url = trim($_POST['url_sercop'] ?? '');
 
         if (empty($url)) {
@@ -415,7 +415,7 @@ class ProcesosController extends BaseController
     {
         $this->requirePermission('procesos.*');
         verifyCsrf();
-        $instituciones = Institucion::all('nombre ASC');
+        $instituciones = Institucion::all('created_at DESC');
         $html = trim($_POST['html_sercop'] ?? '');
         $url  = trim($_POST['url_sercop']  ?? '');
 
@@ -702,7 +702,7 @@ class ProcesosController extends BaseController
     {
         $this->requirePermission('procesos.*');
         $proceso       = Proceso::conInstitucion((int)$id);
-        $instituciones = Institucion::all('nombre ASC');
+        $instituciones = Institucion::all('created_at DESC');
         $this->view('procesos.edit', compact('proceso', 'instituciones') + ['title' => 'Editar Proceso']);
     }
 
@@ -1348,7 +1348,7 @@ class IaController extends BaseController
     {
         $analisis      = AnalisisIA::findOrFail((int)$id);
         $datos         = json_decode($analisis['datos_extraidos'], true);
-        $instituciones = Institucion::all('nombre ASC');
+        $instituciones = Institucion::all('created_at DESC');
         $this->view('ia.aplicar', compact('analisis', 'datos', 'instituciones') + ['title' => 'Aplicar Análisis IA']);
     }
 
