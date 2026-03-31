@@ -146,9 +146,9 @@ class PdfExtractorService
         if (!preg_match_all(
             '/<tr[^>]*>\s*<td[^>]*>\s*(\d+)\s*<\/td>\s*' .   // No.
             '<td[^>]*>\s*(\d{5,12})\s*<\/td>\s*' .             // CPC código
-            '<td[^>]*>\s*([^<]{2,200})\s*<\/td>\s*' .          // CPC descripción
+            '<td[^>]*>\s*([^<]{2,800})\s*<\/td>\s*' .          // CPC descripción (puede ser muy larga)
             '<td[^>]*>\s*([\s\S]{2,2000}?)\s*<\/td>\s*' .      // Descripción producto (multiline)
-            '<td[^>]*>\s*([^<]{2,50})\s*<\/td>\s*' .           // Unidad
+            '<td[^>]*>\s*([^<]{1,80})\s*<\/td>\s*' .           // Unidad
             '<td[^>]*>\s*([\d.,]+)\s*<\/td>/si',
             $hd, $matches, PREG_SET_ORDER
         )) {
