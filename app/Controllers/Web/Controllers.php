@@ -504,7 +504,6 @@ class ProcesosController extends BaseController
                     'administrador_cargo'  => 'Administrador del Contrato',
                     'activo'               => 1,
                 ]);
-            } else {
                 DB::audit('CREATE', 'instituciones', $institucionId, null, ['nombre' => $instNombre]);
             }
         }
