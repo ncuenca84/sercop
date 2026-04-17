@@ -1,6 +1,17 @@
 Options -Indexes
 Options +FollowSymLinks
 
+# Límites de tamaño de solicitud (evita error 413 en formularios grandes)
+LimitRequestBody 20971520
+<IfModule mod_php.c>
+    php_value post_max_size 20M
+    php_value upload_max_filesize 10M
+</IfModule>
+<IfModule lsapi_module>
+    php_value post_max_size 20M
+    php_value upload_max_filesize 10M
+</IfModule>
+
 RewriteEngine On
 
 # Forzar HTTPS
